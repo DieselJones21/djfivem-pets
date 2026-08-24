@@ -270,6 +270,11 @@ document.addEventListener('click', (event) => {
         return;
     }
     const actionBtn = event.target.closest('.actions button');
+    if (actionBtn && actionBtn.disabled) {
+        const why = actionBtn.getAttribute('title');
+        if (why) $('hint').textContent = why;
+        return;
+    }
     if (actionBtn && !actionBtn.disabled) {
         const action = actionBtn.getAttribute('data-action');
         if (!isFiveM) {
