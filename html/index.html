@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kennel</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="app" class="hidden" aria-hidden="true">
+        <section class="panel" role="dialog" aria-labelledby="pet-name">
+            <header class="panel-head">
+                <div class="brand">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" width="28" height="28">
+                            <ellipse cx="18" cy="18" rx="8" ry="11" transform="rotate(-18 18 18)" fill="currentColor"/>
+                            <ellipse cx="32" cy="12" rx="7" ry="10" fill="currentColor"/>
+                            <ellipse cx="46" cy="18" rx="8" ry="11" transform="rotate(18 46 18)" fill="currentColor"/>
+                            <ellipse cx="14" cy="32" rx="7" ry="9" transform="rotate(-40 14 32)" fill="currentColor"/>
+                            <path d="M20 40c0-8 8-14 12-14s12 6 12 14-10 16-12 16-12-8-12-16z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <p class="eyebrow">Kennel</p>
+                        <p class="sub">Companion ledger</p>
+                    </div>
+                </div>
+                <button id="btn-close" class="icon-btn" type="button" aria-label="Close">ESC</button>
+            </header>
+
+            <nav id="pet-switcher" class="switcher" aria-label="Your pets"></nav>
+
+            <div class="body">
+                <aside class="portrait">
+                    <div id="badge" class="badge">
+                        <span id="badge-glyph">RT</span>
+                    </div>
+                    <ul class="chips" id="chips"></ul>
+                </aside>
+
+                <div class="details">
+                    <div class="title-row">
+                        <div>
+                            <h1 id="pet-name">Buddy</h1>
+                            <p id="pet-meta" class="meta">Rottweiler · 4 days</p>
+                        </div>
+                        <div class="level">
+                            <span id="pet-level">Lv 1</span>
+                            <div class="bond-track" title="Bond">
+                                <div id="bond-fill" class="bond-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats" id="stats"></div>
+
+                    <p id="hint" class="hint"></p>
+
+                    <div class="actions" id="actions"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
