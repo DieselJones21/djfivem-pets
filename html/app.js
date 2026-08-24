@@ -11,6 +11,9 @@ const SPECIES = {
     pet_cat: { glyph: 'CT', color: '#8a7048', label: 'Cat' },
     pet_rabbit: { glyph: 'RB', color: '#7d7468', label: 'Rabbit' },
     pet_pig: { glyph: 'PI', color: '#8b5664', label: 'Pig' },
+    pet_monkey: { glyph: 'MK', color: '#6b5340', label: 'Monkey' },
+    pet_coyote: { glyph: 'CY', color: '#8a7048', label: 'Coyote' },
+    pet_mtlion: { glyph: 'ML', color: '#9a6b2e', label: 'Mountain Lion' },
 };
 
 const ACTIONS = [
@@ -92,6 +95,63 @@ const MOCK = {
             level: 2,
             ageDays: 20,
         },
+        {
+            petId: 'demo-4',
+            name: 'Kong',
+            species: 'pet_monkey',
+            speciesLabel: 'Monkey',
+            canAttack: true,
+            dead: false,
+            collar: true,
+            spawned: false,
+            walking: false,
+            sitting: false,
+            health: 94,
+            hunger: 70,
+            thirst: 66,
+            happiness: 88,
+            bond: 22,
+            level: 2,
+            ageDays: 8,
+        },
+        {
+            petId: 'demo-5',
+            name: 'Dust',
+            species: 'pet_coyote',
+            speciesLabel: 'Coyote',
+            canAttack: true,
+            dead: false,
+            collar: false,
+            spawned: false,
+            walking: false,
+            sitting: false,
+            health: 88,
+            hunger: 50,
+            thirst: 44,
+            happiness: 60,
+            bond: 8,
+            level: 1,
+            ageDays: 5,
+        },
+        {
+            petId: 'demo-6',
+            name: 'Ridge',
+            species: 'pet_mtlion',
+            speciesLabel: 'Mountain Lion',
+            canAttack: true,
+            dead: false,
+            collar: true,
+            spawned: false,
+            walking: false,
+            sitting: false,
+            health: 100,
+            hunger: 72,
+            thirst: 65,
+            happiness: 54,
+            bond: 30,
+            level: 4,
+            ageDays: 16,
+        },
     ],
 };
 
@@ -154,7 +214,7 @@ function actionState(action, pet) {
         case 'follow':
             return out ? { disabled: false } : { disabled: true, hint: 'Call your pet first.' };
         case 'attack':
-            if (!pet.canAttack) return { disabled: true, hint: 'Only dogs can attack.' };
+            if (!pet.canAttack) return { disabled: true, hint: 'This animal cannot attack.' };
             if (!out) return { disabled: true, hint: 'Call your pet first.' };
             return { disabled: false, hint: 'Aim at a target, then send them.' };
         case 'collar':

@@ -675,11 +675,20 @@ lib.addCommand('givepet', {
     restricted = 'group.admin',
     params = {
         { name = 'target', type = 'playerId', help = 'Player id' },
-        { name = 'species', type = 'string', help = 'rottweiler, cat, husky...' },
+        { name = 'species', type = 'string', help = 'rottweiler, monkey, coyote, mtlion...' },
     },
 }, function(source, args)
-    local itemName = args.species
-    if not itemName:find('^pet_') then
+    local itemName = args.species:lower()
+    local aliases = {
+        mountainlion = 'pet_mtlion',
+        mountain_lion = 'pet_mtlion',
+        lion = 'pet_mtlion',
+        chimp = 'pet_monkey',
+        chimpanzee = 'pet_monkey',
+    }
+    if aliases[itemName] then
+        itemName = aliases[itemName]
+    elseif not itemName:find('^pet_') then
         itemName = 'pet_' .. itemName
     end
     if not Config.Animals[itemName] then

@@ -97,7 +97,7 @@ lib.addKeybind({
 
 lib.addKeybind({
     name = 'djfivem_petattack',
-    description = 'Pet attack (dogs)',
+    description = 'Pet attack',
     defaultKey = Config.AttackKey,
     onPressed = function()
         if not IsLocalPetOut() then return end

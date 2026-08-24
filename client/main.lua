@@ -260,7 +260,7 @@ function PlayPettingAnims()
     if loadAnim(owner.dict) then
         TaskPlayAnim(playerPed, owner.dict, owner.clip, 8.0, -8.0, owner.duration, 0, 0.0, false, false, false)
     end
-    if Config.Animals[LocalPet.species] and Config.Animals[LocalPet.species].canAttack and loadAnim(dog.dict) then
+    if Config.Animals[LocalPet.species] and Config.Animals[LocalPet.species].dogAnims and loadAnim(dog.dict) then
         TaskPlayAnim(LocalPet.ped, dog.dict, dog.clip, 8.0, -8.0, dog.duration, 0, 0.0, false, false, false)
     end
 end

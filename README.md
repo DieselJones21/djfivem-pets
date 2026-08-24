@@ -4,11 +4,11 @@ Interactable GTA animal pets for FiveM. Pets are **ox_inventory items** — use 
 
 ## Features
 
-- **10 vanilla GTA animals:** Rottweiler, Shepherd, Husky, Retriever, Pug, Poodle, Chop, Cat, Rabbit, Pig
+- **13 vanilla GTA animals:** Rottweiler, Shepherd, Husky, Retriever, Pug, Poodle, Chop, Cat, Rabbit, Pig, Monkey, Coyote, Mountain Lion
 - Use the pet item to **call / recall**
 - **Pet, feed, water,** sit, stay, follow
 - **Walks require a collar on the pet and a leash in your inventory**
-- **Dogs can attack** a targeted ped (player attacks optional in config)
+- **Dogs, monkeys, coyotes, and mountain lions can attack** a targeted ped (player attacks optional in config)
 - Pets get hungry and thirsty, can **die**, and need a **revive kit**
 - NUI **pet menu** (default `F6`) with stats, bond/level, and all actions
 - Harmony **pet store** with blip and ox_target
@@ -39,7 +39,7 @@ Item names:
 
 | Item | Use |
 | --- | --- |
-| `pet_rottweiler` `pet_shepherd` `pet_husky` `pet_retriever` `pet_pug` `pet_poodle` `pet_chop` `pet_cat` `pet_rabbit` `pet_pig` | Call / recall that pet |
+| `pet_rottweiler` `pet_shepherd` `pet_husky` `pet_retriever` `pet_pug` `pet_poodle` `pet_chop` `pet_cat` `pet_rabbit` `pet_pig` `pet_monkey` `pet_coyote` `pet_mtlion` | Call / recall that pet |
 | `pet_food` | Feed a spawned pet |
 | `pet_water` | Water a spawned pet |
 | `pet_collar` | Equip a collar (consumed). Required before walking |
@@ -54,10 +54,10 @@ Pet identity, name, collar, and needs are stored on the **item metadata**. Tradi
 2. Use the animal item (or Kennel → Call) to spawn it.
 3. `F6` opens the Kennel menu. You can also target the animal with ox_target.
 4. Use a **collar** on a spawned pet, then use a **leash** (or Walk in the menu) to walk them. No collar or no leash = no walk.
-5. Aim at a ped and press `G` (default) to send a **dog** after it.
+5. Aim at a ped and press `G` (default) to send a **dog, monkey, coyote, or mountain lion** after it.
 6. If health hits 0 from injury or neglect, the pet dies. Use a **revive kit** before it can be called again.
 
-Admin: `/givepet [id] [species]` (`rottweiler`, `cat`, `husky`, …). Ace: `group.admin`.
+Admin: `/givepet [id] [species]` (`rottweiler`, `cat`, `monkey`, `coyote`, `mtlion`, …). Ace: `group.admin`.
 
 ## Config
 
@@ -68,4 +68,4 @@ Edit `config.lua` for shop location, prices, decay, attack-players, vehicle warp
 Players can rebind these in ox_lib keybinds:
 
 - Pet menu: `F6`
-- Dog attack: `G`
+- Pet attack: `G`

@@ -80,6 +80,9 @@ Config.ShopItems = {
     { name = 'pet_cat', price = 3000 },
     { name = 'pet_rabbit', price = 2200 },
     { name = 'pet_pig', price = 3500 },
+    { name = 'pet_monkey', price = 15000 },
+    { name = 'pet_coyote', price = 11000 },
+    { name = 'pet_mtlion', price = 18500 },
     { name = 'pet_food', price = 25 },
     { name = 'pet_water', price = 20 },
     { name = 'pet_collar', price = 150 },
@@ -88,12 +91,14 @@ Config.ShopItems = {
 }
 
 -- item name -> animal definition
--- canAttack: dogs (and Chop) can be sent after a target
+-- canAttack: dogs, monkey, coyote, and mountain lion can be sent after a target
+-- dogAnims: Franklin/Chop petting clips (dogs only)
 Config.Animals = {
     pet_rottweiler = {
         label = 'Rottweiler',
         model = `a_c_rottweiler`,
         canAttack = true,
+        dogAnims = true,
         textures = 0,
         sitScenario = 'WORLD_DOG_SITTING_ROTTWEILER',
         barkScenario = 'WORLD_DOG_BARKING_ROTTWEILER',
@@ -104,6 +109,7 @@ Config.Animals = {
         label = 'Shepherd',
         model = `a_c_shepherd`,
         canAttack = true,
+        dogAnims = true,
         textures = 1,
         sitScenario = 'WORLD_DOG_SITTING_SHEPHERD',
         barkScenario = 'WORLD_DOG_BARKING_SHEPHERD',
@@ -114,6 +120,7 @@ Config.Animals = {
         label = 'Husky',
         model = `a_c_husky`,
         canAttack = true,
+        dogAnims = true,
         textures = 1,
         sitScenario = 'WORLD_DOG_SITTING_RETRIEVER',
         barkScenario = 'WORLD_DOG_BARKING_RETRIEVER',
@@ -124,6 +131,7 @@ Config.Animals = {
         label = 'Retriever',
         model = `a_c_retriever`,
         canAttack = true,
+        dogAnims = true,
         textures = 1,
         sitScenario = 'WORLD_DOG_SITTING_RETRIEVER',
         barkScenario = 'WORLD_DOG_BARKING_RETRIEVER',
@@ -134,6 +142,7 @@ Config.Animals = {
         label = 'Pug',
         model = `a_c_pug`,
         canAttack = true,
+        dogAnims = true,
         textures = 1,
         sitScenario = 'WORLD_DOG_SITTING_TERRIER',
         barkScenario = 'WORLD_DOG_BARKING_SMALL',
@@ -144,6 +153,7 @@ Config.Animals = {
         label = 'Poodle',
         model = `a_c_poodle`,
         canAttack = true,
+        dogAnims = true,
         textures = 0,
         sitScenario = 'WORLD_DOG_SITTING_TERRIER',
         barkScenario = 'WORLD_DOG_BARKING_SMALL',
@@ -154,6 +164,7 @@ Config.Animals = {
         label = 'Chop',
         model = `a_c_chop`,
         canAttack = true,
+        dogAnims = true,
         textures = 0,
         sitScenario = 'WORLD_DOG_SITTING_ROTTWEILER',
         barkScenario = 'WORLD_DOG_BARKING_ROTTWEILER',
@@ -189,6 +200,36 @@ Config.Animals = {
         barkScenario = nil,
         scale = 1.0,
         collar = { bone = 24818, offset = vec3(0.0, 0.12, 0.0), rot = vec3(0.0, 90.0, 0.0) },
+    },
+    pet_monkey = {
+        label = 'Monkey',
+        model = `a_c_chimp`,
+        canAttack = true,
+        textures = 0,
+        sitScenario = nil,
+        barkScenario = nil,
+        scale = 1.0,
+        collar = { bone = 39317, offset = vec3(0.0, 0.02, 0.0), rot = vec3(0.0, 90.0, 0.0) },
+    },
+    pet_coyote = {
+        label = 'Coyote',
+        model = `a_c_coyote`,
+        canAttack = true,
+        textures = 0,
+        sitScenario = nil,
+        barkScenario = 'WORLD_COYOTE_HOWL',
+        scale = 1.0,
+        collar = { bone = 39317, offset = vec3(0.0, 0.0, -0.02), rot = vec3(0.0, 90.0, 0.0) },
+    },
+    pet_mtlion = {
+        label = 'Mountain Lion',
+        model = `a_c_mtlion`,
+        canAttack = true,
+        textures = 0,
+        sitScenario = 'WORLD_MOUNTAIN_LION_REST',
+        barkScenario = nil,
+        scale = 1.0,
+        collar = { bone = 39317, offset = vec3(0.0, 0.02, -0.04), rot = vec3(0.0, 90.0, 0.0) },
     },
 }
 
