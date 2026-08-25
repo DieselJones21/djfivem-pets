@@ -1,8 +1,8 @@
 {
     "resource_name": "Kennel",
     "no_pets": "You don't have a pet. Buy one from the pet store.",
-    "pet_called": "%s is here.",
-    "pet_recalled": "%s headed home.",
+    "pet_called": "You called %s out.",
+    "pet_recalled": "You put %s away.",
     "pet_dead": "%s is dead. Use a pet revive kit.",
     "pet_already_out": "You already have a pet out.",
     "pet_not_out": "Call your pet first.",

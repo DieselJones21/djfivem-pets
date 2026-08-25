@@ -17,17 +17,17 @@ const SPECIES = {
 };
 
 const ACTIONS = [
-    { id: 'toggle', label: 'Call / Recall' },
+    { id: 'toggle', label: 'Call out' },
     { id: 'pet', label: 'Pet' },
     { id: 'feed', label: 'Feed' },
     { id: 'water', label: 'Water' },
     { id: 'walk', label: 'Walk' },
-    { id: 'unwalk', label: 'End walk' },
+    { id: 'unwalk', label: 'Stop' },
     { id: 'sit', label: 'Sit' },
     { id: 'stay', label: 'Stay' },
     { id: 'follow', label: 'Follow' },
     { id: 'attack', label: 'Attack' },
-    { id: 'collar', label: 'Put collar on' },
+    { id: 'collar', label: 'Collar' },
     { id: 'revive', label: 'Revive' },
     { id: 'rename', label: 'Rename' },
 ];
@@ -234,6 +234,14 @@ function actionState(action, pet) {
     }
 }
 
+function applyMenuBox(menu) {
+    const root = document.documentElement;
+    if (!menu) return;
+    if (menu.top) root.style.setProperty('--menu-top', menu.top);
+    if (menu.right) root.style.setProperty('--menu-right', menu.right);
+    if (menu.width) root.style.setProperty('--menu-width', `${menu.width}px`);
+}
+
 function render() {
     const pet = selectedPet();
     const app = $('app');
@@ -288,7 +296,11 @@ function render() {
         if (info.hint && !info.disabled && !hint) hint = info.hint;
         if (info.disabled && info.hint && action.id === 'walk' && !pet.collar) hint = info.hint;
         const danger = action.id === 'attack' || action.id === 'revive' ? 'danger' : '';
-        return `<button type="button" class="${danger}" data-action="${action.id}" ${info.disabled ? 'disabled' : ''} title="${info.hint || ''}">${action.label}</button>`;
+        const primary = action.id === 'toggle' ? 'primary' : '';
+        const label = action.id === 'toggle'
+            ? (pet.spawned ? 'Put away' : 'Call out')
+            : action.label;
+        return `<button type="button" class="${danger} ${primary}" data-action="${action.id}" ${info.disabled ? 'disabled' : ''} title="${info.hint || ''}">${label}</button>`;
     }).join('');
     $('hint').textContent = hint;
 }
@@ -304,6 +316,7 @@ function applyData(data) {
 window.addEventListener('message', (event) => {
     const msg = event.data || {};
     if (msg.action === 'open' || msg.action === 'update') {
+        applyMenuBox(msg.menu);
         applyData(msg.data);
     }
     if (msg.action === 'close') {
@@ -343,7 +356,10 @@ document.addEventListener('click', (event) => {
                 if (action === 'feed') pet.hunger = Math.min(100, pet.hunger + 42);
                 if (action === 'water') pet.thirst = Math.min(100, pet.thirst + 48);
                 if (action === 'pet') pet.happiness = Math.min(100, pet.happiness + 14);
-                if (action === 'toggle') pet.spawned = !pet.spawned;
+                if (action === 'toggle') {
+                    pet.spawned = !pet.spawned;
+                    if (!pet.spawned) pet.walking = false;
+                }
                 if (action === 'walk' && pet.collar) pet.walking = true;
                 if (action === 'unwalk') pet.walking = false;
                 if (action === 'collar') pet.collar = true;
@@ -372,6 +388,7 @@ document.addEventListener('keydown', (event) => {
 if (!isFiveM) {
     document.body.classList.add('preview');
     window.addEventListener('DOMContentLoaded', () => {
+        applyMenuBox({ top: '2.2vh', right: '1.6vw', width: 332 });
         applyData(MOCK);
     });
 }

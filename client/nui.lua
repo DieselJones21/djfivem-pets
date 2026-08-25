@@ -10,7 +10,7 @@ end
 local function pushMenu(data)
     menuOpen = true
     SetNuiFocus(true, true)
-    SendNUIMessage({ action = 'open', data = data })
+    SendNUIMessage({ action = 'open', data = data, menu = Config.Menu })
 end
 
 function OpenPetMenu(petId)
@@ -33,7 +33,7 @@ local function refreshMenu(petId)
         closeMenu()
         return
     end
-    SendNUIMessage({ action = 'update', data = data })
+    SendNUIMessage({ action = 'update', data = data, menu = Config.Menu })
 end
 
 RegisterNetEvent('djfivem-pets:client:refreshMenu', function(petId)

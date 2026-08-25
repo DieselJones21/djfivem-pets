@@ -4,7 +4,13 @@ Config.Debug = false
 Config.MenuKey = 'F6'
 Config.AttackKey = 'G'
 Config.MaxSpawnedPets = 1
-Config.CallCooldown = 4000
+Config.Menu = {
+    top = '2.2vh',
+    right = '1.6vw',
+    width = 332,
+}
+
+Config.CallCooldown = 1200
 Config.ActionCooldown = 1200
 Config.AttackCooldown = 8000
 Config.FollowDistance = 2.2
