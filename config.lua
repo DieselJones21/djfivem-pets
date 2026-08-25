@@ -7,7 +7,7 @@ Config.MaxSpawnedPets = 1
 Config.Menu = {
     top = '16px',
     right = '16px',
-    width = 332,
+    width = 348,
 }
 
 Config.CallCooldown = 1200

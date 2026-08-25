@@ -10,31 +10,33 @@
     <div id="app" class="hidden" aria-hidden="true">
         <section class="panel" role="dialog" aria-labelledby="pet-name">
             <header class="panel-head">
-                <div class="identity">
-                    <div id="badge" class="badge"><span id="badge-glyph">RT</span></div>
+                <div class="profile">
+                    <div id="badge" class="avatar"><span id="badge-glyph">RT</span></div>
                     <div class="who">
                         <h1 id="pet-name">Buddy</h1>
-                        <p id="pet-meta" class="meta">Rottweiler · 4 days</p>
+                        <p class="rank"><span id="pet-meta">Rottweiler</span> · <span id="pet-level">Lv 1</span></p>
                     </div>
                 </div>
-                <div class="head-right">
-                    <span id="pet-level" class="level">Lv 1</span>
-                    <button id="btn-close" class="icon-btn" type="button" aria-label="Close">×</button>
-                </div>
+                <button id="btn-close" class="icon-btn" type="button" aria-label="Close">×</button>
             </header>
 
-            <nav id="pet-switcher" class="switcher" aria-label="Your pets"></nav>
+            <nav id="pet-switcher" class="nav-pills" aria-label="Your pets"></nav>
 
-            <ul class="chips" id="chips"></ul>
+            <div class="stat-grid" id="stats"></div>
 
-            <div class="stats" id="stats"></div>
-            <div class="bond-row">
-                <span>Bond</span>
-                <div class="bond-track"><div id="bond-fill" class="bond-fill"></div></div>
-            </div>
+            <section class="overview">
+                <div class="overview-head">
+                    <h2>Actions</h2>
+                    <div class="seg" id="chips"></div>
+                </div>
+                <p id="hint" class="hint"></p>
+                <div class="action-nav" id="actions"></div>
+            </section>
 
-            <p id="hint" class="hint"></p>
-            <div class="actions" id="actions"></div>
+            <footer class="foot">
+                <span class="kbd">F6</span>
+                Minimize menu
+            </footer>
         </section>
     </div>
     <script src="app.js"></script>
