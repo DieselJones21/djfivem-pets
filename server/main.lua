@@ -1,6 +1,7 @@
 local Spawned = {}
 local Cooldown = {}
 local LastHealthWrite = {}
+local PendingToggle = {}
 
 math.randomseed(os.time())
 
@@ -179,10 +180,7 @@ local function killPet(src, slot, item, meta, reason)
 end
 
 local function togglePet(src, item, slot)
-    if onCooldown(src, 'call', Config.CallCooldown) then
-        notify(src, 'error', 'busy')
-        return
-    end
+    if PendingToggle[src] then return end
 
     local meta = ensureMeta(src, slot, item)
     if meta.dead then
@@ -191,19 +189,29 @@ local function togglePet(src, item, slot)
     end
 
     local spawned = Spawned[src]
-    if spawned then
-        if spawned.petId == meta.petId then
-            lib.callback.await('djfivem-pets:despawnPet', src)
-            Spawned[src] = nil
-            notify(src, 'inform', 'pet_recalled', meta.name)
-            refresh(src, meta.petId)
-            return
-        end
-        notify(src, 'error', 'pet_already_out')
+    if spawned and spawned.petId == meta.petId then
+        PendingToggle[src] = true
+        lib.callback.await('djfivem-pets:despawnPet', src)
+        PendingToggle[src] = nil
+        Spawned[src] = nil
+        notify(src, 'inform', 'pet_recalled', meta.name)
+        refresh(src, meta.petId)
         return
     end
 
+    if onCooldown(src, 'call', Config.CallCooldown) then
+        notify(src, 'error', 'busy')
+        return
+    end
+
+    if spawned then
+        lib.callback.await('djfivem-pets:despawnPet', src)
+        Spawned[src] = nil
+    end
+
+    PendingToggle[src] = true
     local netId = lib.callback.await('djfivem-pets:spawnPet', src, meta)
+    PendingToggle[src] = nil
     if not netId then
         notify(src, 'error', 'action_failed')
         return
@@ -556,9 +564,30 @@ local function useSupplyAction(src, action)
     runAction(src, { action = action })
 end
 
+local LastItemUse = {}
+
+local function handlePetUse(src, item, slot)
+    local now = GetGameTimer()
+    if LastItemUse[src] and (now - LastItemUse[src]) < 250 then
+        return
+    end
+    LastItemUse[src] = now
+    togglePet(src, item, slot)
+end
+
+RegisterNetEvent('djfivem-pets:server:useSlot', function(slot)
+    local src = source
+    slot = tonumber(slot)
+    if not slot then return end
+    local items = getItems(src)
+    local item = items[slot]
+    if not item or not IsPetItem(item.name) then return end
+    handlePetUse(src, item, slot)
+end)
+
 exports('usePet', function(event, item, inventory, slot)
-    if event ~= 'usingItem' then return end
-    togglePet(inventory.id, item, slot)
+    if event ~= 'usingItem' and event ~= 'usedItem' then return end
+    handlePetUse(inventory.id, item, slot)
 end)
 
 exports('useFood', function(event, item, inventory)
@@ -708,4 +737,6 @@ AddEventHandler('playerDropped', function()
     Spawned[src] = nil
     Cooldown[src] = nil
     LastHealthWrite[src] = nil
+    LastItemUse[src] = nil
+    PendingToggle[src] = nil
 end)

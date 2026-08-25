@@ -449,3 +449,7 @@ AddEventHandler('onResourceStop', function(resource)
         DespawnLocalPet()
     end
 end)
+
+exports('usePetClient', function(_, slot)
+    TriggerServerEvent('djfivem-pets:server:useSlot', slot)
+end)

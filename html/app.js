@@ -17,20 +17,36 @@ const SPECIES = {
 };
 
 const ACTIONS = [
-    { id: 'toggle', label: 'Call / Recall' },
+    { id: 'toggle', label: 'Call out' },
     { id: 'pet', label: 'Pet' },
     { id: 'feed', label: 'Feed' },
     { id: 'water', label: 'Water' },
     { id: 'walk', label: 'Walk' },
-    { id: 'unwalk', label: 'End walk' },
+    { id: 'unwalk', label: 'Stop' },
     { id: 'sit', label: 'Sit' },
     { id: 'stay', label: 'Stay' },
     { id: 'follow', label: 'Follow' },
     { id: 'attack', label: 'Attack' },
-    { id: 'collar', label: 'Put collar on' },
+    { id: 'collar', label: 'Collar' },
     { id: 'revive', label: 'Revive' },
     { id: 'rename', label: 'Rename' },
 ];
+
+const ICONS = {
+    toggle: '<svg viewBox="0 0 24 24"><path d="M8 7h8M8 12h8M8 17h5"/></svg>',
+    pet: '<svg viewBox="0 0 24 24"><path d="M7 13c0-2 1.5-3 3-3s3 1 5 1 3-1 3-1-1 6-5 6-6-2-6-3z"/><circle cx="8" cy="8" r="1.2"/><circle cx="12" cy="6.5" r="1.2"/><circle cx="16" cy="8" r="1.2"/></svg>',
+    feed: '<svg viewBox="0 0 24 24"><path d="M5 14c0-4 3-7 7-7s7 3 7 7v2H5z"/><path d="M8 18h8"/></svg>',
+    water: '<svg viewBox="0 0 24 24"><path d="M12 4s6 7 6 11a6 6 0 1 1-12 0c0-4 6-11 6-11z"/></svg>',
+    walk: '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M9 22l2-8 3 2 2 6M9 10l3 2 4-3"/></svg>',
+    unwalk: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    sit: '<svg viewBox="0 0 24 24"><path d="M5 20V10h4v10M13 20V8h6"/></svg>',
+    stay: '<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1"/></svg>',
+    follow: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    attack: '<svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 .5-4.5 4 1.5 6L12 16l-5 3.5 1.5-6L4 9.5 10 9z"/></svg>',
+    collar: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="5"/><circle cx="18" cy="12" r="1.5"/></svg>',
+    revive: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+    rename: '<svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/></svg>',
+};
 
 const MOCK = {
     selected: 'demo-1',
@@ -234,6 +250,14 @@ function actionState(action, pet) {
     }
 }
 
+function applyMenuBox(menu) {
+    const root = document.documentElement;
+    if (!menu) return;
+    if (menu.top) root.style.setProperty('--menu-top', menu.top);
+    if (menu.right) root.style.setProperty('--menu-right', menu.right);
+    if (menu.width) root.style.setProperty('--menu-width', `${menu.width}px`);
+}
+
 function render() {
     const pet = selectedPet();
     const app = $('app');
@@ -246,49 +270,57 @@ function render() {
     app.classList.remove('hidden');
     app.setAttribute('aria-hidden', 'false');
 
-    const spec = SPECIES[pet.species] || { glyph: 'PT', color: '#5a5044', label: pet.speciesLabel };
-    $('badge').style.background = `radial-gradient(circle at 50% 38%, rgba(255,255,255,0.12), transparent 52%), ${spec.color}`;
+    const spec = SPECIES[pet.species] || { glyph: 'PT', color: '#2a2a2a', label: pet.speciesLabel };
+    $('badge').style.background = spec.color;
     $('badge-glyph').textContent = spec.glyph;
     $('pet-name').textContent = pet.name;
-    $('pet-meta').textContent = `${pet.speciesLabel} · ${pet.ageDays} day${pet.ageDays === 1 ? '' : 's'} old`;
-    $('pet-level').textContent = `Lv ${pet.level}`;
-    $('bond-fill').style.width = `${Math.max(0, Math.min(100, pet.bond))}%`;
+    $('pet-meta').textContent = pet.speciesLabel;
+    $('pet-level').textContent = pet.dead ? 'Down' : `Lv ${pet.level}`;
 
     $('pet-switcher').innerHTML = state.pets.map((entry) => {
         const active = entry.petId === pet.petId ? 'active' : '';
-        const mark = entry.dead ? ' (down)' : entry.spawned ? ' (out)' : '';
+        const mark = entry.dead ? ' · down' : entry.spawned ? ' · out' : '';
         return `<button type="button" class="${active}" data-id="${entry.petId}">${entry.name}${mark}</button>`;
     }).join('');
 
-    const chips = [];
-    chips.push(`<li class="${pet.dead ? 'dead' : 'on'}">${pet.dead ? 'Deceased' : 'Alive'}</li>`);
-    chips.push(`<li class="${pet.spawned ? 'on' : ''}">${pet.spawned ? 'Out' : 'Home'}</li>`);
-    chips.push(`<li class="${pet.collar ? 'on' : ''}">${pet.collar ? 'Collared' : 'No collar'}</li>`);
-    chips.push(`<li class="${pet.walking ? 'on' : ''}">${pet.walking ? 'On leash' : 'No leash'}</li>`);
-    if (pet.canAttack) chips.push('<li class="on">Can attack</li>');
-    $('chips').innerHTML = chips.join('');
+    const segs = [];
+    segs.push(`<span class="${pet.dead ? 'dead' : 'on'}">${pet.dead ? 'Down' : 'Alive'}</span>`);
+    segs.push(`<span class="${pet.spawned ? 'on' : ''}">${pet.spawned ? 'Out' : 'Home'}</span>`);
+    if (pet.collar) segs.push('<span class="on">Collar</span>');
+    if (pet.walking) segs.push('<span class="on">Leash</span>');
+    $('chips').innerHTML = segs.join('');
 
     const stats = [
-        ['Health', 'health', pet.health],
-        ['Hunger', 'hunger', pet.hunger],
-        ['Thirst', 'thirst', pet.thirst],
-        ['Mood', 'mood', pet.happiness],
+        ['Health', pet.health],
+        ['Hunger', pet.hunger],
+        ['Thirst', pet.thirst],
+        ['Mood', pet.happiness],
     ];
-    $('stats').innerHTML = stats.map(([label, cls, value]) => `
-        <div class="stat">
-            <span>${label}</span>
-            <div class="track"><div class="fill ${cls}" style="width:${value}%"></div></div>
-            <b>${Math.round(value)}</b>
-        </div>
-    `).join('');
+    $('stats').innerHTML = stats.map(([label, value]) => {
+        const n = Math.round(value);
+        const trend = n >= 70 ? 'up' : n <= 25 ? 'down' : '';
+        const arrow = n >= 70 ? '↑' : n <= 25 ? '↓' : '';
+        return `
+            <article class="metric">
+                <p class="metric-label">${label}</p>
+                <div class="metric-row">
+                    <strong>${n}</strong>
+                    <span class="trend ${trend}">${arrow} ${n}%</span>
+                </div>
+            </article>
+        `;
+    }).join('');
 
     let hint = '';
     $('actions').innerHTML = ACTIONS.map((action) => {
         const info = actionState(action.id, pet);
         if (info.hint && !info.disabled && !hint) hint = info.hint;
         if (info.disabled && info.hint && action.id === 'walk' && !pet.collar) hint = info.hint;
-        const danger = action.id === 'attack' || action.id === 'revive' ? 'danger' : '';
-        return `<button type="button" class="${danger}" data-action="${action.id}" ${info.disabled ? 'disabled' : ''} title="${info.hint || ''}">${action.label}</button>`;
+        const primary = action.id === 'toggle' ? 'primary' : '';
+        const label = action.id === 'toggle'
+            ? (pet.spawned ? 'Put away' : 'Call out')
+            : action.label;
+        return `<button type="button" class="${primary}" data-action="${action.id}" ${info.disabled ? 'disabled' : ''} title="${info.hint || ''}">${ICONS[action.id] || ''}${label}</button>`;
     }).join('');
     $('hint').textContent = hint;
 }
@@ -304,6 +336,7 @@ function applyData(data) {
 window.addEventListener('message', (event) => {
     const msg = event.data || {};
     if (msg.action === 'open' || msg.action === 'update') {
+        applyMenuBox(msg.menu);
         applyData(msg.data);
     }
     if (msg.action === 'close') {
@@ -322,14 +355,14 @@ document.addEventListener('click', (event) => {
         }
         return;
     }
-    const switchBtn = event.target.closest('.switcher button');
+    const switchBtn = event.target.closest('.nav-pills button');
     if (switchBtn) {
         selectedId = switchBtn.getAttribute('data-id');
         nui('select', { petId: selectedId });
         render();
         return;
     }
-    const actionBtn = event.target.closest('.actions button');
+    const actionBtn = event.target.closest('.action-nav button');
     if (actionBtn && actionBtn.disabled) {
         const why = actionBtn.getAttribute('title');
         if (why) $('hint').textContent = why;
@@ -343,7 +376,10 @@ document.addEventListener('click', (event) => {
                 if (action === 'feed') pet.hunger = Math.min(100, pet.hunger + 42);
                 if (action === 'water') pet.thirst = Math.min(100, pet.thirst + 48);
                 if (action === 'pet') pet.happiness = Math.min(100, pet.happiness + 14);
-                if (action === 'toggle') pet.spawned = !pet.spawned;
+                if (action === 'toggle') {
+                    pet.spawned = !pet.spawned;
+                    if (!pet.spawned) pet.walking = false;
+                }
                 if (action === 'walk' && pet.collar) pet.walking = true;
                 if (action === 'unwalk') pet.walking = false;
                 if (action === 'collar') pet.collar = true;
@@ -372,6 +408,7 @@ document.addEventListener('keydown', (event) => {
 if (!isFiveM) {
     document.body.classList.add('preview');
     window.addEventListener('DOMContentLoaded', () => {
+        applyMenuBox({ top: '16px', right: '16px', width: 348 });
         applyData(MOCK);
     });
 }

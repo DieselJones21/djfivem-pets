@@ -10,7 +10,7 @@ Interactable GTA animal pets for FiveM. Pets are **ox_inventory items** — use 
 - **Walks require a collar on the pet and a leash in your inventory**
 - **Dogs, monkeys, coyotes, and mountain lions can attack** a targeted ped (player attacks optional in config)
 - Pets get hungry and thirsty, can **die**, and need a **revive kit**
-- NUI **pet menu** (default `F6`) with stats, bond/level, and all actions
+- NUI **pet menu** (default `F6`) — compact HUD in the **top-right**. Call the animal with the item, use the same item again to put it away.
 - Harmony **pet store** with blip and ox_target
 - OneSync networked peds so other players can see your animal
 
@@ -51,8 +51,8 @@ Pet identity, name, collar, and needs are stored on the **item metadata**. Tradi
 ## How to play
 
 1. Buy a pet, food, water, a collar, a leash, and a revive kit at the **Pet Store** (Harmony, near YouTool — move it in `config.lua`).
-2. Use the animal item (or Kennel → Call) to spawn it.
-3. `F6` opens the Kennel menu. You can also target the animal with ox_target.
+2. Use the animal item to spawn it. Use that same item again to put it away.
+3. `F6` opens the compact Kennel menu in the top-right. You can also target the animal with ox_target.
 4. Use a **collar** on a spawned pet, then use a **leash** (or Walk in the menu) to walk them. No collar or no leash = no walk.
 5. Aim at a ped and press `G` (default) to send a **dog, monkey, coyote, or mountain lion** after it.
 6. If health hits 0 from injury or neglect, the pet dies. Use a **revive kit** before it can be called again.

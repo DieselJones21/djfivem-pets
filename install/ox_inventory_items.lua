@@ -10,7 +10,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_shepherd'] = {
         label = 'Shepherd',
@@ -18,7 +18,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_husky'] = {
         label = 'Husky',
@@ -26,7 +26,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_retriever'] = {
         label = 'Retriever',
@@ -34,7 +34,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_pug'] = {
         label = 'Pug',
@@ -42,7 +42,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_poodle'] = {
         label = 'Poodle',
@@ -50,7 +50,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_chop'] = {
         label = 'Chop',
@@ -58,7 +58,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_cat'] = {
         label = 'Cat',
@@ -66,7 +66,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_rabbit'] = {
         label = 'Rabbit',
@@ -74,7 +74,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_pig'] = {
         label = 'Pig',
@@ -82,7 +82,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_monkey'] = {
         label = 'Monkey',
@@ -90,7 +90,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_coyote'] = {
         label = 'Coyote',
@@ -98,7 +98,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_mtlion'] = {
         label = 'Mountain Lion',
@@ -106,7 +106,7 @@
         stack = false,
         close = true,
         consume = 0,
-        server = { export = 'djfivem-pets.usePet' },
+        server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' },
     },
     ['pet_food'] = {
         label = 'Pet Food',
@@ -151,19 +151,19 @@
 ]]
 
 return {
-    pet_rottweiler = { label = 'Rottweiler', weight = 4000, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_shepherd = { label = 'Shepherd', weight = 3800, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_husky = { label = 'Husky', weight = 3600, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_retriever = { label = 'Retriever', weight = 3400, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_pug = { label = 'Pug', weight = 1600, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_poodle = { label = 'Poodle', weight = 1800, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_chop = { label = 'Chop', weight = 4200, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_cat = { label = 'Cat', weight = 900, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_rabbit = { label = 'Rabbit', weight = 600, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_pig = { label = 'Pig', weight = 5000, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_monkey = { label = 'Monkey', weight = 2500, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_coyote = { label = 'Coyote', weight = 3200, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
-    pet_mtlion = { label = 'Mountain Lion', weight = 4500, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' } },
+    pet_rottweiler = { label = 'Rottweiler', weight = 4000, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_shepherd = { label = 'Shepherd', weight = 3800, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_husky = { label = 'Husky', weight = 3600, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_retriever = { label = 'Retriever', weight = 3400, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_pug = { label = 'Pug', weight = 1600, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_poodle = { label = 'Poodle', weight = 1800, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_chop = { label = 'Chop', weight = 4200, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_cat = { label = 'Cat', weight = 900, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_rabbit = { label = 'Rabbit', weight = 600, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_pig = { label = 'Pig', weight = 5000, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_monkey = { label = 'Monkey', weight = 2500, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_coyote = { label = 'Coyote', weight = 3200, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
+    pet_mtlion = { label = 'Mountain Lion', weight = 4500, stack = false, close = true, consume = 0, server = { export = 'djfivem-pets.usePet' }, client = { export = 'djfivem-pets.usePetClient' } },
     pet_food = { label = 'Pet Food', weight = 200, stack = true, close = true, consume = 0, server = { export = 'djfivem-pets.useFood' } },
     pet_water = { label = 'Pet Water', weight = 200, stack = true, close = true, consume = 0, server = { export = 'djfivem-pets.useWater' } },
     pet_collar = { label = 'Pet Collar', weight = 80, stack = true, close = true, consume = 0, server = { export = 'djfivem-pets.useCollar' } },
