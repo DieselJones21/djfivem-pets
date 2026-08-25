@@ -5,8 +5,8 @@ Config.MenuKey = 'F6'
 Config.AttackKey = 'G'
 Config.MaxSpawnedPets = 1
 Config.Menu = {
-    top = '2.2vh',
-    right = '1.6vw',
+    top = '16px',
+    right = '16px',
     width = 332,
 }
 

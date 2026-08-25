@@ -388,7 +388,7 @@ document.addEventListener('keydown', (event) => {
 if (!isFiveM) {
     document.body.classList.add('preview');
     window.addEventListener('DOMContentLoaded', () => {
-        applyMenuBox({ top: '2.2vh', right: '1.6vw', width: 332 });
+        applyMenuBox({ top: '16px', right: '16px', width: 332 });
         applyData(MOCK);
     });
 }
