@@ -127,14 +127,9 @@ h1 {
 
 .nav-pills {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
-    overflow-x: auto;
     margin-bottom: 10px;
-    scrollbar-width: none;
-}
-
-.nav-pills::-webkit-scrollbar {
-    display: none;
 }
 
 .nav-pills button {
