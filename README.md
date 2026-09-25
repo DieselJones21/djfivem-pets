@@ -81,9 +81,12 @@ ensure djfivem-pets
 
 ## Install ox_inventory items
 
-1. Copy every entry from `install/ox_inventory_items.lua` into `ox_inventory/data/items.lua`.
-2. Copy the PNGs from `install/images/` into `ox_inventory/web/images/`.
-3. Restart `ox_inventory`, then this resource.
+1. Open `ox_inventory/data/items.lua`.
+2. Copy every item block from `install/ox_inventory_items.lua` (between `PASTE START` and `PASTE END`) into that file's `return { }` table. Each companion already has the `djfivem-pets` server/client exports.
+3. Copy the PNGs from `install/images/` into `ox_inventory/web/images/`. Keep the filenames (`pet_lspd.png`, `pet_food.png`, …).
+4. Restart `ox_inventory`, then this resource.
+
+Remove any old entries such as `pet_cat`, `pet_pug`, `pet_monkey`, `pet_coyote`, `pet_mtlion`, `pet_rabbit`, or `pet_rottweiler` if they are still in your items file.
 
 The shop charges the `money` item by default. Change `Config.Shop.currency.item` if your economy uses a different ox_inventory cash item. Set `Config.Shop.useCustomUI = false` to fall back to the default ox_inventory shop.
 
