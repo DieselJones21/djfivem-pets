@@ -7,6 +7,7 @@ LocalPet = {
     staying = false,
     sitting = false,
     attacking = false,
+    guarding = false,
 }
 
 local collarObject = 0
@@ -21,7 +22,7 @@ local function loadModel(model)
     if not IsModelValid(model) then return false end
     if HasModelLoaded(model) then return true end
     RequestModel(model)
-    local timeout = GetGameTimer() + 5000
+    local timeout = GetGameTimer() + (Config.ModelLoadTimeout or 8000)
     while not HasModelLoaded(model) do
         if GetGameTimer() > timeout then return false end
         Wait(10)
@@ -98,6 +99,7 @@ function DespawnLocalPet()
     LocalPet.staying = false
     LocalPet.sitting = false
     LocalPet.attacking = false
+    LocalPet.guarding = false
 end
 
 local function placeOnGround(ped)
@@ -121,7 +123,7 @@ function SpawnLocalPet(meta)
     local coords = GetOffsetFromEntityInWorldCoords(playerPed, 0.35, 1.6, 0.0)
     local heading = GetEntityHeading(playerPed) + 180.0
 
-    local ped = CreatePed(28, animal.model, coords.x, coords.y, coords.z, heading, true, true)
+    local ped = CreatePed(animal.pedType or 28, animal.model, coords.x, coords.y, coords.z, heading, true, true)
     SetEntityAsMissionEntity(ped, true, true)
     SetModelAsNoLongerNeeded(animal.model)
     placeOnGround(ped)
@@ -162,6 +164,7 @@ function SpawnLocalPet(meta)
     LocalPet.staying = false
     LocalPet.sitting = false
     LocalPet.attacking = false
+    LocalPet.guarding = false
 
     if meta.collar then
         AttachCollar(ped, meta.species)
@@ -199,7 +202,7 @@ local function warpPetOutOfVehicle(playerPed)
 end
 
 local function followOwner()
-    if not IsLocalPetOut() or LocalPet.staying or LocalPet.sitting or LocalPet.attacking then return end
+    if not IsLocalPetOut() or LocalPet.staying or LocalPet.sitting or LocalPet.attacking or LocalPet.guarding then return end
     local playerPed = PlayerPedId()
     if IsPedInAnyVehicle(playerPed, false) then return end
     if IsPedInAnyVehicle(LocalPet.ped, false) then return end
@@ -227,6 +230,7 @@ function SetPetStay(stay)
     LocalPet.staying = stay
     LocalPet.sitting = false
     if stay then
+        LocalPet.guarding = false
         ClearPedTasks(LocalPet.ped)
         TaskStandStill(LocalPet.ped, -1)
     else
@@ -238,6 +242,7 @@ function SetPetSit(sit)
     if not IsLocalPetOut() then return end
     LocalPet.sitting = sit
     LocalPet.staying = sit
+    LocalPet.guarding = false
     ClearPedTasks(LocalPet.ped)
     if not sit then
         followOwner()
@@ -311,6 +316,7 @@ function CommandAttack(target)
 
     LocalPet.staying = false
     LocalPet.sitting = false
+    LocalPet.guarding = false
     LocalPet.attacking = true
     ClearPedTasks(LocalPet.ped)
     TaskCombatPed(LocalPet.ped, target, 0, 16)
@@ -322,6 +328,64 @@ function CommandAttack(target)
                 ClearPedTasks(LocalPet.ped)
                 followOwner()
             end
+        end
+    end)
+    return true
+end
+
+function SetPetGuard(guard)
+    if not IsLocalPetOut() then return end
+    local animal = Config.Animals[LocalPet.species]
+    if guard and not HasK9Trait(animal, 'guard') then return end
+
+    LocalPet.guarding = guard and true or false
+    LocalPet.staying = LocalPet.guarding
+    LocalPet.sitting = false
+    LocalPet.attacking = false
+    ClearPedTasks(LocalPet.ped)
+
+    if not LocalPet.guarding then
+        followOwner()
+        return
+    end
+
+    local radius = (Config.K9 and Config.K9.guardRadius) or 8.0
+    TaskGuardCurrentPosition(LocalPet.ped, radius, radius, true)
+end
+
+function CommandSearch(target)
+    if not IsLocalPetOut() then return false end
+    local animal = Config.Animals[LocalPet.species]
+    if not HasK9Trait(animal, 'search') then return false end
+
+    if LocalPet.walking then
+        StopLeash()
+        LocalPet.walking = false
+        TriggerServerEvent('djfivem-pets:server:setWalking', false)
+    end
+
+    LocalPet.staying = false
+    LocalPet.sitting = false
+    LocalPet.guarding = false
+    LocalPet.attacking = false
+    ClearPedTasks(LocalPet.ped)
+
+    if target and target ~= 0 and DoesEntityExist(target) then
+        TaskGoToEntity(LocalPet.ped, target, -1, 1.2, 3.0, 0, 0)
+    end
+
+    if animal.barkScenario then
+        SetTimeout(900, function()
+            if IsLocalPetOut() then
+                TaskStartScenarioInPlace(LocalPet.ped, animal.barkScenario, 0, true)
+            end
+        end)
+    end
+
+    SetTimeout(4500, function()
+        if IsLocalPetOut() and not LocalPet.attacking and not LocalPet.guarding then
+            ClearPedTasks(LocalPet.ped)
+            followOwner()
         end
     end)
     return true
@@ -423,17 +487,28 @@ RegisterNetEvent('djfivem-pets:client:setSit', function(sit)
     SetPetSit(sit)
 end)
 
-RegisterNetEvent('djfivem-pets:client:attack', function(payload)
-    local target = 0
+local function resolveTargetPed(payload)
     if payload and payload.isPlayer and payload.serverId then
         local player = GetPlayerFromServerId(payload.serverId)
         if player ~= -1 then
-            target = GetPlayerPed(player)
+            return GetPlayerPed(player)
         end
     elseif payload and payload.netId then
-        target = NetworkGetEntityFromNetworkId(payload.netId)
+        return NetworkGetEntityFromNetworkId(payload.netId)
     end
-    CommandAttack(target)
+    return 0
+end
+
+RegisterNetEvent('djfivem-pets:client:attack', function(payload)
+    CommandAttack(resolveTargetPed(payload))
+end)
+
+RegisterNetEvent('djfivem-pets:client:search', function(payload)
+    CommandSearch(resolveTargetPed(payload))
+end)
+
+RegisterNetEvent('djfivem-pets:client:setGuard', function(guard)
+    SetPetGuard(guard)
 end)
 
 RegisterNetEvent('djfivem-pets:client:notify', function(key, nType, ...)

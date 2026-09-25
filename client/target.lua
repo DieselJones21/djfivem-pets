@@ -83,9 +83,33 @@ local function petOptions()
             end,
         },
         {
+            name = 'djfivem_pets_search',
+            icon = 'fa-solid fa-magnifying-glass',
+            label = 'K9 search',
+            distance = Config.InteractDistance,
+            canInteract = function()
+                return HasK9Trait(LocalPet.species and Config.Animals[LocalPet.species], 'search')
+            end,
+            onSelect = function()
+                TriggerServerEvent('djfivem-pets:server:action', { action = 'search' })
+            end,
+        },
+        {
+            name = 'djfivem_pets_guard',
+            icon = 'fa-solid fa-shield-halved',
+            label = 'K9 guard',
+            distance = Config.InteractDistance,
+            canInteract = function()
+                return HasK9Trait(LocalPet.species and Config.Animals[LocalPet.species], 'guard')
+            end,
+            onSelect = function()
+                TriggerServerEvent('djfivem-pets:server:action', { action = 'guard' })
+            end,
+        },
+        {
             name = 'djfivem_pets_menu',
             icon = 'fa-solid fa-paw',
-            label = 'Pet menu',
+            label = 'Open kennel',
             distance = Config.InteractDistance,
             onSelect = function()
                 OpenPetMenu()
