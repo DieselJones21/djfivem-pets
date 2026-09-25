@@ -2,6 +2,10 @@ function IsPetItem(itemName)
     return Config.Animals[itemName] ~= nil
 end
 
+function IsSupplyItem(itemName)
+    return Config.Supplies[itemName] ~= nil
+end
+
 function DefaultPetMetadata(itemName)
     local animal = Config.Animals[itemName]
     if not animal then return {} end
@@ -98,7 +102,7 @@ end
 
 function UpdatePetDescription(meta)
     local animal = Config.Animals[meta.species]
-    local species = animal and animal.label or 'Pet'
+    local species = animal and animal.label or 'Companion'
     local status = meta.dead and 'Deceased' or 'Alive'
     local collar = meta.collar and 'Collared' or 'No collar'
     meta.description = ('%s · %s · %s'):format(species, status, collar)
@@ -108,4 +112,87 @@ end
 function AgeInDays(meta)
     if not meta.born then return 0 end
     return math.max(0, math.floor((os.time() - meta.born) / 86400))
+end
+
+function ResolvePetItem(input)
+    if type(input) ~= 'string' or input == '' then
+        return nil
+    end
+
+    local raw = input:lower():gsub('%s+', '_'):gsub('-', '_')
+    if Config.Animals[raw] then
+        return raw
+    end
+
+    if not raw:find('^pet_') and Config.Animals['pet_' .. raw] then
+        return 'pet_' .. raw
+    end
+
+    for name, animal in pairs(Config.Animals) do
+        if animal.label:lower():gsub('%s+', '_') == raw then
+            return name
+        end
+        if animal.modelName and animal.modelName:lower() == raw then
+            return name
+        end
+        if name:gsub('^pet_', '') == raw then
+            return name
+        end
+    end
+end
+
+function GetCatalog()
+    local animals = {}
+    for name, animal in pairs(Config.Animals) do
+        animals[#animals + 1] = {
+            name = name,
+            label = animal.label,
+            category = animal.category,
+            rarity = animal.rarity,
+            price = animal.price,
+            canAttack = animal.canAttack == true,
+            description = animal.description or '',
+            image = ('images/%s.png'):format(name),
+        }
+    end
+    table.sort(animals, function(a, b)
+        if a.category == b.category then
+            return a.price < b.price
+        end
+        return a.category < b.category
+    end)
+
+    local supplies = {}
+    local order = { 'pet_food', 'pet_water', 'pet_collar', 'pet_leash', 'pet_revive' }
+    for i = 1, #order do
+        local name = order[i]
+        local item = Config.Supplies[name]
+        supplies[#supplies + 1] = {
+            name = name,
+            label = item.label,
+            category = 'supplies',
+            rarity = 'common',
+            price = item.price,
+            canAttack = false,
+            description = item.description or '',
+            image = ('images/%s.png'):format(name),
+        }
+    end
+
+    return {
+        animals = animals,
+        supplies = supplies,
+        categories = Config.Categories,
+        shopName = Config.Shop.name,
+        currency = Config.Shop.currency.item,
+    }
+end
+
+function GetItemPrice(itemName)
+    if Config.Animals[itemName] then
+        return Config.Animals[itemName].price
+    end
+    if Config.Supplies[itemName] then
+        return Config.Supplies[itemName].price
+    end
 end

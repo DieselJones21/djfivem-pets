@@ -85,7 +85,7 @@ local function petOptions()
         {
             name = 'djfivem_pets_menu',
             icon = 'fa-solid fa-paw',
-            label = 'Pet menu',
+            label = 'Open kennel',
             distance = Config.InteractDistance,
             onSelect = function()
                 OpenPetMenu()

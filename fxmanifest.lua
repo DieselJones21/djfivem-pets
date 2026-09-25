@@ -4,8 +4,8 @@ lua54 'yes'
 
 name 'djfivem-pets'
 author 'DieselJones21'
-description 'Interactable GTA animal pets with ox_inventory items, needs, walks, and a pet menu'
-version '1.0.0'
+description 'Premium companion system with 41 animals, needs, walks, a modern kennel HUD, and a custom emporium'
+version '2.0.0'
 
 ox_lib 'locale'
 
@@ -33,6 +33,7 @@ files {
     'html/index.html',
     'html/style.css',
     'html/app.js',
+    'html/images/*.png',
     'locales/*.json',
 }
 

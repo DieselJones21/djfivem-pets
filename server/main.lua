@@ -118,6 +118,9 @@ local function serialize(src, item, meta)
         species = item.name,
         speciesLabel = animal.label or item.label or item.name,
         canAttack = animal.canAttack == true,
+        category = animal.category,
+        rarity = animal.rarity,
+        image = ('images/%s.png'):format(item.name),
         dead = meta.dead == true,
         collar = meta.collar == true,
         spawned = isOut,
@@ -647,6 +650,49 @@ local function registerHooks()
     end)
 end
 
+local function takeShopMoney(src, amount)
+    local currency = Config.Shop.currency or {}
+    if currency.type ~= 'ox_inventory' then
+        return false
+    end
+    local item = currency.item or 'money'
+    if countItem(src, item) < amount then
+        return false
+    end
+    return exports.ox_inventory:RemoveItem(src, item, amount) and true or false
+end
+
+lib.callback.register('djfivem-pets:getCatalog', function()
+    return GetCatalog()
+end)
+
+lib.callback.register('djfivem-pets:buyItem', function(source, itemName)
+    if not Config.Shop.enabled then
+        return { ok = false, message = locale('shop_failed') }
+    end
+    local price = GetItemPrice(itemName)
+    if not price then
+        return { ok = false, message = locale('shop_unknown') }
+    end
+    if not takeShopMoney(source, price) then
+        return { ok = false, message = locale('shop_need_money', price) }
+    end
+
+    local metadata = IsPetItem(itemName) and DefaultPetMetadata(itemName) or nil
+    if exports.ox_inventory:AddItem(source, itemName, 1, metadata) then
+        local label = (Config.Animals[itemName] and Config.Animals[itemName].label)
+            or (Config.Supplies[itemName] and Config.Supplies[itemName].label)
+            or itemName
+        return { ok = true, message = locale('shop_bought', label, price) }
+    end
+
+    local currency = Config.Shop.currency or {}
+    if currency.type == 'ox_inventory' then
+        exports.ox_inventory:AddItem(source, currency.item or 'money', price)
+    end
+    return { ok = false, message = locale('shop_failed') }
+end)
+
 CreateThread(function()
     if Config.Shop.enabled then
         exports.ox_inventory:RegisterShop('djfivem_petstore', {
@@ -704,23 +750,11 @@ lib.addCommand('givepet', {
     restricted = 'group.admin',
     params = {
         { name = 'target', type = 'playerId', help = 'Player id' },
-        { name = 'species', type = 'string', help = 'rottweiler, monkey, coyote, mtlion...' },
+        { name = 'species', type = 'string', help = 'husky, cane, wolf, sphynx...' },
     },
 }, function(source, args)
-    local itemName = args.species:lower()
-    local aliases = {
-        mountainlion = 'pet_mtlion',
-        mountain_lion = 'pet_mtlion',
-        lion = 'pet_mtlion',
-        chimp = 'pet_monkey',
-        chimpanzee = 'pet_monkey',
-    }
-    if aliases[itemName] then
-        itemName = aliases[itemName]
-    elseif not itemName:find('^pet_') then
-        itemName = 'pet_' .. itemName
-    end
-    if not Config.Animals[itemName] then
+    local itemName = ResolvePetItem(args.species)
+    if not itemName then
         notify(source, 'error', 'command_givepet_species')
         return
     end

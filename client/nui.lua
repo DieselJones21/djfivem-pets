@@ -1,10 +1,18 @@
 local menuOpen = false
+local shopOpen = false
 
 local function closeMenu()
     if not menuOpen then return end
     menuOpen = false
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'close' })
+end
+
+local function closeShop()
+    if not shopOpen then return end
+    shopOpen = false
+    SetNuiFocus(false, false)
+    SendNUIMessage({ action = 'closeShop' })
 end
 
 local function pushMenu(data)
@@ -14,6 +22,9 @@ local function pushMenu(data)
 end
 
 function OpenPetMenu(petId)
+    if shopOpen then
+        closeShop()
+    end
     local data = lib.callback.await('djfivem-pets:getMenuData', false, petId)
     if not data or not data.pets or #data.pets == 0 then
         lib.notify({
@@ -84,9 +95,13 @@ end)
 
 lib.addKeybind({
     name = 'djfivem_petmenu',
-    description = 'Open pet menu',
+    description = 'Open companion kennel',
     defaultKey = Config.MenuKey,
     onPressed = function()
+        if shopOpen then
+            closeShop()
+            return
+        end
         if menuOpen then
             closeMenu()
         else
@@ -97,7 +112,7 @@ lib.addKeybind({
 
 lib.addKeybind({
     name = 'djfivem_petattack',
-    description = 'Pet attack',
+    description = 'Send companion to attack',
     defaultKey = Config.AttackKey,
     onPressed = function()
         if not IsLocalPetOut() then return end
@@ -111,4 +126,37 @@ end, false)
 
 RegisterNetEvent('djfivem-pets:client:openMenu', function()
     OpenPetMenu()
+end)
+
+function OpenPetShop()
+    if menuOpen then
+        closeMenu()
+    end
+    local data = lib.callback.await('djfivem-pets:getCatalog', false)
+    if not data then return end
+    shopOpen = true
+    SetNuiFocus(true, true)
+    SendNUIMessage({ action = 'openShop', data = data })
+end
+
+RegisterNUICallback('closeShop', function(_, cb)
+    closeShop()
+    cb({ ok = true })
+end)
+
+RegisterNUICallback('buy', function(body, cb)
+    local itemName = body and body.item
+    if not itemName then
+        cb({ ok = false, message = locale('shop_unknown') })
+        return
+    end
+    local result = lib.callback.await('djfivem-pets:buyItem', false, itemName)
+    cb(result or { ok = false, message = locale('shop_failed') })
+end)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource == GetCurrentResourceName() then
+        closeMenu()
+        closeShop()
+    end
 end)

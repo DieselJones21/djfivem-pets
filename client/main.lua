@@ -21,7 +21,7 @@ local function loadModel(model)
     if not IsModelValid(model) then return false end
     if HasModelLoaded(model) then return true end
     RequestModel(model)
-    local timeout = GetGameTimer() + 5000
+    local timeout = GetGameTimer() + (Config.ModelLoadTimeout or 8000)
     while not HasModelLoaded(model) do
         if GetGameTimer() > timeout then return false end
         Wait(10)
@@ -121,7 +121,7 @@ function SpawnLocalPet(meta)
     local coords = GetOffsetFromEntityInWorldCoords(playerPed, 0.35, 1.6, 0.0)
     local heading = GetEntityHeading(playerPed) + 180.0
 
-    local ped = CreatePed(28, animal.model, coords.x, coords.y, coords.z, heading, true, true)
+    local ped = CreatePed(animal.pedType or 28, animal.model, coords.x, coords.y, coords.z, heading, true, true)
     SetEntityAsMissionEntity(ped, true, true)
     SetModelAsNoLongerNeeded(animal.model)
     placeOnGround(ped)

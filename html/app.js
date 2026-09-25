@@ -1,23 +1,7 @@
 const isFiveM = typeof GetParentResourceName === 'function';
 
-const SPECIES = {
-    pet_rottweiler: { glyph: 'RT', color: '#6d3b32', label: 'Rottweiler' },
-    pet_shepherd: { glyph: 'GS', color: '#5c4632', label: 'Shepherd' },
-    pet_husky: { glyph: 'HK', color: '#4e5c68', label: 'Husky' },
-    pet_retriever: { glyph: 'RV', color: '#8a6230', label: 'Retriever' },
-    pet_pug: { glyph: 'PG', color: '#7a5a46', label: 'Pug' },
-    pet_poodle: { glyph: 'PD', color: '#6b5b73', label: 'Poodle' },
-    pet_chop: { glyph: 'CH', color: '#3f3a36', label: 'Chop' },
-    pet_cat: { glyph: 'CT', color: '#8a7048', label: 'Cat' },
-    pet_rabbit: { glyph: 'RB', color: '#7d7468', label: 'Rabbit' },
-    pet_pig: { glyph: 'PI', color: '#8b5664', label: 'Pig' },
-    pet_monkey: { glyph: 'MK', color: '#6b5340', label: 'Monkey' },
-    pet_coyote: { glyph: 'CY', color: '#8a7048', label: 'Coyote' },
-    pet_mtlion: { glyph: 'ML', color: '#9a6b2e', label: 'Mountain Lion' },
-};
-
 const ACTIONS = [
-    { id: 'toggle', label: 'Call out' },
+    { id: 'toggle', label: 'Call' },
     { id: 'pet', label: 'Pet' },
     { id: 'feed', label: 'Feed' },
     { id: 'water', label: 'Water' },
@@ -57,8 +41,11 @@ const MOCK = {
         {
             petId: 'demo-1',
             name: 'Brass',
-            species: 'pet_rottweiler',
-            speciesLabel: 'Rottweiler',
+            species: 'pet_cane',
+            speciesLabel: 'Cane Corso',
+            category: 'dogs',
+            rarity: 'rare',
+            image: 'images/pet_cane.png',
             canAttack: true,
             dead: false,
             collar: true,
@@ -76,8 +63,11 @@ const MOCK = {
         {
             petId: 'demo-2',
             name: 'Miso',
-            species: 'pet_cat',
-            speciesLabel: 'Cat',
+            species: 'pet_sphynx',
+            speciesLabel: 'Sphynx',
+            category: 'cats',
+            rarity: 'rare',
+            image: 'images/pet_sphynx.png',
             canAttack: false,
             dead: false,
             collar: false,
@@ -97,6 +87,9 @@ const MOCK = {
             name: 'Ash',
             species: 'pet_husky',
             speciesLabel: 'Husky',
+            category: 'dogs',
+            rarity: 'uncommon',
+            image: 'images/pet_husky.png',
             canAttack: true,
             dead: true,
             collar: true,
@@ -113,10 +106,13 @@ const MOCK = {
         },
         {
             petId: 'demo-4',
-            name: 'Kong',
-            species: 'pet_monkey',
-            speciesLabel: 'Monkey',
-            canAttack: true,
+            name: 'Pebble',
+            species: 'pet_capybara',
+            speciesLabel: 'Capybara',
+            category: 'exotic',
+            rarity: 'epic',
+            image: 'images/pet_capybara.png',
+            canAttack: false,
             dead: false,
             collar: true,
             spawned: false,
@@ -132,28 +128,12 @@ const MOCK = {
         },
         {
             petId: 'demo-5',
-            name: 'Dust',
-            species: 'pet_coyote',
-            speciesLabel: 'Coyote',
-            canAttack: true,
-            dead: false,
-            collar: false,
-            spawned: false,
-            walking: false,
-            sitting: false,
-            health: 88,
-            hunger: 50,
-            thirst: 44,
-            happiness: 60,
-            bond: 8,
-            level: 1,
-            ageDays: 5,
-        },
-        {
-            petId: 'demo-6',
             name: 'Ridge',
-            species: 'pet_mtlion',
-            speciesLabel: 'Mountain Lion',
+            species: 'pet_wolf',
+            speciesLabel: 'Wolf',
+            category: 'wild',
+            rarity: 'epic',
+            image: 'images/pet_wolf.png',
             canAttack: true,
             dead: false,
             collar: true,
@@ -171,8 +151,44 @@ const MOCK = {
     ],
 };
 
+const MOCK_CATALOG = {
+    shopName: 'Companion Emporium',
+    currency: 'money',
+    categories: [
+        { id: 'dogs', label: 'Dogs' },
+        { id: 'puppies', label: 'Puppies' },
+        { id: 'cats', label: 'Cats' },
+        { id: 'farm', label: 'Farm' },
+        { id: 'exotic', label: 'Exotic' },
+        { id: 'wild', label: 'Wild' },
+        { id: 'special', label: 'Special' },
+        { id: 'supplies', label: 'Supplies' },
+    ],
+    animals: [
+        { name: 'pet_cane', label: 'Cane Corso', category: 'dogs', rarity: 'rare', price: 11000, canAttack: true, description: 'An Italian mastiff built like a vault door.', image: 'images/pet_cane.png' },
+        { name: 'pet_husky', label: 'Husky', category: 'dogs', rarity: 'uncommon', price: 8750, canAttack: true, description: 'A thick-coated northern working dog.', image: 'images/pet_husky.png' },
+        { name: 'pet_sphynx', label: 'Sphynx', category: 'cats', rarity: 'rare', price: 6500, canAttack: false, description: 'Hairless, warm, and wildly affectionate.', image: 'images/pet_sphynx.png' },
+        { name: 'pet_capybara', label: 'Capybara', category: 'exotic', rarity: 'epic', price: 16000, canAttack: false, description: 'The world\'s most relaxed roommate.', image: 'images/pet_capybara.png' },
+        { name: 'pet_wolf', label: 'Wolf', category: 'wild', rarity: 'epic', price: 17000, canAttack: true, description: 'A timber wolf with a low howl.', image: 'images/pet_wolf.png' },
+        { name: 'pet_yorkie', label: 'Yorkshire Terrier Puppy', category: 'puppies', rarity: 'common', price: 3900, canAttack: true, description: 'A silk-haired scrap of confidence.', image: 'images/pet_yorkie.png' },
+        { name: 'pet_robot', label: 'Zathura', category: 'special', rarity: 'legendary', price: 25000, canAttack: true, description: 'A compact companion automaton.', image: 'images/pet_robot.png' },
+    ],
+    supplies: [
+        { name: 'pet_food', label: 'Premium Kibble', category: 'supplies', rarity: 'common', price: 25, description: 'Slow-baked kibble.', image: 'images/pet_food.png' },
+        { name: 'pet_water', label: 'Fresh Water', category: 'supplies', rarity: 'common', price: 20, description: 'Clean drinking water.', image: 'images/pet_water.png' },
+        { name: 'pet_collar', label: 'Leather Collar', category: 'supplies', rarity: 'common', price: 150, description: 'Required before walking.', image: 'images/pet_collar.png' },
+        { name: 'pet_leash', label: 'Walking Leash', category: 'supplies', rarity: 'common', price: 125, description: 'Keep this on you to walk.', image: 'images/pet_leash.png' },
+        { name: 'pet_revive', label: 'Revive Kit', category: 'supplies', rarity: 'common', price: 750, description: 'Field medicine for a downed pet.', image: 'images/pet_revive.png' },
+    ],
+};
+
 let state = null;
 let selectedId = null;
+let catalog = null;
+let shopCategory = 'all';
+let shopQuery = '';
+let shopSelected = null;
+let buying = false;
 
 function resourceName() {
     return isFiveM ? GetParentResourceName() : 'djfivem-pets';
@@ -194,6 +210,22 @@ function $(id) {
     return document.getElementById(id);
 }
 
+function glyphFor(label) {
+    return (label || 'PT').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase() || 'PT';
+}
+
+function imageFor(pet) {
+    return pet.image || `images/${pet.species}.png`;
+}
+
+function rarityLabel(value) {
+    return (value || 'companion').replace(/_/g, ' ');
+}
+
+function money(value) {
+    return `$${Number(value || 0).toLocaleString('en-US')}`;
+}
+
 function selectedPet() {
     if (!state) return null;
     return state.pets.find((pet) => pet.petId === selectedId) || state.pets[0];
@@ -205,43 +237,43 @@ function actionState(action, pet) {
     switch (action) {
         case 'toggle':
             return pet.dead
-                ? { disabled: true, hint: 'Revive this pet before calling it.' }
-                : { disabled: false, hint: pet.spawned ? 'Send them home.' : 'Use the pet item or call them out.' };
+                ? { disabled: true, hint: 'Revive this companion first.' }
+                : { disabled: false, hint: pet.spawned ? 'Send them home.' : 'Call them to your side.' };
         case 'pet':
-            return out ? { disabled: false } : { disabled: true, hint: 'Call your pet first.' };
+            return out ? { disabled: false } : { disabled: true, hint: 'Call your companion first.' };
         case 'feed':
-            if (!out) return { disabled: true, hint: 'Call your pet first.' };
-            if (!supplies.food) return { disabled: true, hint: 'You need pet food.' };
+            if (!out) return { disabled: true, hint: 'Call your companion first.' };
+            if (!supplies.food) return { disabled: true, hint: 'You need premium kibble.' };
             return { disabled: false };
         case 'water':
-            if (!out) return { disabled: true, hint: 'Call your pet first.' };
-            if (!supplies.water) return { disabled: true, hint: 'You need pet water.' };
+            if (!out) return { disabled: true, hint: 'Call your companion first.' };
+            if (!supplies.water) return { disabled: true, hint: 'You need fresh water.' };
             return { disabled: false };
         case 'walk':
-            if (!out) return { disabled: true, hint: 'Call your pet first.' };
+            if (!out) return { disabled: true, hint: 'Call your companion first.' };
             if (pet.walking) return { disabled: true, hint: 'Already on a walk.' };
-            if (!pet.collar) return { disabled: true, hint: 'Put a collar on them first.' };
+            if (!pet.collar) return { disabled: true, hint: 'Fit a collar first.' };
             if (!supplies.leash) return { disabled: true, hint: 'You need a leash in your inventory.' };
             return { disabled: false, hint: 'Collar and leash required.' };
         case 'unwalk':
-            return pet.walking ? { disabled: false } : { disabled: true, hint: 'You are not walking this pet.' };
+            return pet.walking ? { disabled: false } : { disabled: true, hint: 'You are not walking this companion.' };
         case 'sit':
         case 'stay':
         case 'follow':
-            return out ? { disabled: false } : { disabled: true, hint: 'Call your pet first.' };
+            return out ? { disabled: false } : { disabled: true, hint: 'Call your companion first.' };
         case 'attack':
-            if (!pet.canAttack) return { disabled: true, hint: 'This animal cannot attack.' };
-            if (!out) return { disabled: true, hint: 'Call your pet first.' };
+            if (!pet.canAttack) return { disabled: true, hint: 'This companion cannot attack.' };
+            if (!out) return { disabled: true, hint: 'Call your companion first.' };
             return { disabled: false, hint: 'Aim at a target, then send them.' };
         case 'collar':
             if (pet.dead) return { disabled: true, hint: 'Revive them first.' };
-            if (!out) return { disabled: true, hint: 'Call your pet first.' };
+            if (!out) return { disabled: true, hint: 'Call your companion first.' };
             if (pet.collar) return { disabled: true, hint: 'Already collared.' };
-            if (!supplies.collar) return { disabled: true, hint: 'You need a pet collar.' };
+            if (!supplies.collar) return { disabled: true, hint: 'You need a leather collar.' };
             return { disabled: false };
         case 'revive':
-            if (!pet.dead) return { disabled: true, hint: 'This pet is alive.' };
-            if (!supplies.revive) return { disabled: true, hint: 'You need a pet revive kit.' };
+            if (!pet.dead) return { disabled: true, hint: 'This companion is alive.' };
+            if (!supplies.revive) return { disabled: true, hint: 'You need a revive kit.' };
             return { disabled: false };
         case 'rename':
             return { disabled: false };
@@ -258,7 +290,21 @@ function applyMenuBox(menu) {
     if (menu.width) root.style.setProperty('--menu-width', `${menu.width}px`);
 }
 
-function render() {
+function bindImage(img, src, fallbackEl) {
+    if (!img) return;
+    img.onload = () => {
+        img.style.display = 'block';
+        if (fallbackEl) fallbackEl.parentElement.classList.add('has-image');
+    };
+    img.onerror = () => {
+        img.removeAttribute('src');
+        img.style.display = 'none';
+        if (fallbackEl) fallbackEl.parentElement.classList.remove('has-image');
+    };
+    img.src = src;
+}
+
+function renderKennel() {
     const pet = selectedPet();
     const app = $('app');
     if (!pet) {
@@ -270,46 +316,55 @@ function render() {
     app.classList.remove('hidden');
     app.setAttribute('aria-hidden', 'false');
 
-    const spec = SPECIES[pet.species] || { glyph: 'PT', color: '#2a2a2a', label: pet.speciesLabel };
-    $('badge').style.background = spec.color;
-    $('badge-glyph').textContent = spec.glyph;
+    const glyph = glyphFor(pet.speciesLabel || pet.name);
+    $('badge').style.background = '';
+    $('badge-glyph').textContent = glyph;
+    bindImage($('badge-img'), imageFor(pet), $('badge-glyph'));
     $('pet-name').textContent = pet.name;
     $('pet-meta').textContent = pet.speciesLabel;
+    $('pet-rarity').textContent = rarityLabel(pet.rarity || pet.category);
     $('pet-level').textContent = pet.dead ? 'Down' : `Lv ${pet.level}`;
+    $('age-label').textContent = `${pet.ageDays || 0} day${pet.ageDays === 1 ? '' : 's'} old`;
 
     $('pet-switcher').innerHTML = state.pets.map((entry) => {
         const active = entry.petId === pet.petId ? 'active' : '';
-        const mark = entry.dead ? ' · down' : entry.spawned ? ' · out' : '';
-        return `<button type="button" class="${active}" data-id="${entry.petId}">${entry.name}${mark}</button>`;
+        const down = entry.dead ? 'down' : '';
+        return `
+            <button type="button" class="pet-chip ${active} ${down}" data-id="${entry.petId}">
+                <img alt="" src="${imageFor(entry)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'glyph',textContent:'${glyphFor(entry.speciesLabel)}'}))" />
+                <span>${entry.name}</span>
+            </button>
+        `;
     }).join('');
 
     const segs = [];
-    segs.push(`<span class="${pet.dead ? 'dead' : 'on'}">${pet.dead ? 'Down' : 'Alive'}</span>`);
-    segs.push(`<span class="${pet.spawned ? 'on' : ''}">${pet.spawned ? 'Out' : 'Home'}</span>`);
-    if (pet.collar) segs.push('<span class="on">Collar</span>');
-    if (pet.walking) segs.push('<span class="on">Leash</span>');
+    segs.push(`<span class="pill ${pet.dead ? 'dead' : 'live'}">${pet.dead ? 'Down' : 'Alive'}</span>`);
+    segs.push(`<span class="pill ${pet.spawned ? 'on' : ''}">${pet.spawned ? 'Out' : 'Home'}</span>`);
+    if (pet.collar) segs.push('<span class="pill on">Collar</span>');
+    if (pet.walking) segs.push('<span class="pill on">Leash</span>');
+    if (pet.canAttack) segs.push('<span class="pill">Guard</span>');
     $('chips').innerHTML = segs.join('');
 
     const stats = [
-        ['Health', pet.health],
-        ['Hunger', pet.hunger],
-        ['Thirst', pet.thirst],
-        ['Mood', pet.happiness],
+        ['Health', pet.health, '#8fbf8a'],
+        ['Hunger', pet.hunger, '#e8c36a'],
+        ['Thirst', pet.thirst, '#7eb6ff'],
+        ['Mood', pet.happiness, '#c89bff'],
     ];
-    $('stats').innerHTML = stats.map(([label, value]) => {
+    $('stats').innerHTML = stats.map(([label, value, tone]) => {
         const n = Math.round(value);
-        const trend = n >= 70 ? 'up' : n <= 25 ? 'down' : '';
-        const arrow = n >= 70 ? '↑' : n <= 25 ? '↓' : '';
         return `
             <article class="metric">
+                <div class="ring" style="--value:${n};--tone:${tone}"><strong>${n}</strong></div>
                 <p class="metric-label">${label}</p>
-                <div class="metric-row">
-                    <strong>${n}</strong>
-                    <span class="trend ${trend}">${arrow} ${n}%</span>
-                </div>
             </article>
         `;
     }).join('');
+
+    const bondMax = 100;
+    const bond = Math.round(pet.bond || 0);
+    $('bond-label').textContent = pet.dead ? 'Recover first' : `Lv ${pet.level} · ${bond}/${bondMax}`;
+    $('bond-fill').style.width = `${Math.max(0, Math.min(100, bond))}%`;
 
     let hint = '';
     $('actions').innerHTML = ACTIONS.map((action) => {
@@ -318,7 +373,7 @@ function render() {
         if (info.disabled && info.hint && action.id === 'walk' && !pet.collar) hint = info.hint;
         const primary = action.id === 'toggle' ? 'primary' : '';
         const label = action.id === 'toggle'
-            ? (pet.spawned ? 'Put away' : 'Call out')
+            ? (pet.spawned ? 'Home' : 'Call')
             : action.label;
         return `<button type="button" class="${primary}" data-action="${action.id}" ${info.disabled ? 'disabled' : ''} title="${info.hint || ''}">${ICONS[action.id] || ''}${label}</button>`;
     }).join('');
@@ -330,7 +385,95 @@ function applyData(data) {
     if (!selectedId || !data.pets.some((pet) => pet.petId === selectedId)) {
         selectedId = data.selected || (data.pets[0] && data.pets[0].petId);
     }
-    render();
+    renderKennel();
+}
+
+function catalogItems() {
+    if (!catalog) return [];
+    return [...(catalog.animals || []), ...(catalog.supplies || [])];
+}
+
+function filteredCatalog() {
+    const query = shopQuery.trim().toLowerCase();
+    return catalogItems().filter((item) => {
+        if (shopCategory !== 'all' && item.category !== shopCategory) return false;
+        if (!query) return true;
+        return item.label.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
+    });
+}
+
+function renderShop() {
+    const shop = $('shop');
+    if (!catalog) {
+        shop.classList.add('hidden');
+        shop.setAttribute('aria-hidden', 'true');
+        return;
+    }
+
+    shop.classList.remove('hidden');
+    shop.setAttribute('aria-hidden', 'false');
+    $('shop-title').textContent = catalog.shopName || 'Companion Emporium';
+
+    const cats = [{ id: 'all', label: 'All' }, ...(catalog.categories || [])];
+    $('shop-cats').innerHTML = cats.map((cat) => (
+        `<button type="button" class="${shopCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}">${cat.label}</button>`
+    )).join('');
+
+    const items = filteredCatalog();
+    $('shop-grid').innerHTML = items.map((item) => `
+        <button type="button" class="shop-card ${shopSelected && shopSelected.name === item.name ? 'active' : ''}" data-item="${item.name}">
+            <div class="art"><img alt="" src="${item.image}" onerror="this.style.display='none'" /></div>
+            <div class="meta">
+                <h3>${item.label}</h3>
+                <span class="price">${money(item.price)}</span>
+            </div>
+            <p>${item.category === 'supplies' ? 'Supply' : item.canAttack ? 'Can guard' : 'Companion'}</p>
+            <span class="rarity ${item.rarity || ''}">${rarityLabel(item.rarity)}</span>
+        </button>
+    `).join('') || '<p class="hint">No companions match that search.</p>';
+
+    const detail = $('shop-detail');
+    if (!shopSelected) {
+        detail.classList.add('hidden');
+        return;
+    }
+
+    detail.classList.remove('hidden');
+    detail.innerHTML = `
+        <img alt="" src="${shopSelected.image}" onerror="this.style.display='none'" />
+        <span class="rarity ${shopSelected.rarity || ''}">${rarityLabel(shopSelected.rarity)}</span>
+        <h3>${shopSelected.label}</h3>
+        <p>${shopSelected.description}</p>
+        <button class="buy-btn" type="button" data-buy="${shopSelected.name}" ${buying ? 'disabled' : ''}>
+            ${buying ? 'Purchasing…' : `Adopt · ${money(shopSelected.price)}`}
+        </button>
+    `;
+}
+
+function openShop(data) {
+    catalog = data;
+    shopCategory = 'all';
+    shopQuery = '';
+    shopSelected = (data.animals && data.animals[0]) || null;
+    $('shop-search').value = '';
+    renderShop();
+}
+
+function closeShopUi() {
+    $('shop').classList.add('hidden');
+    $('shop').setAttribute('aria-hidden', 'true');
+    catalog = null;
+    shopSelected = null;
+}
+
+function showToast(text) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2400);
 }
 
 window.addEventListener('message', (event) => {
@@ -344,24 +487,67 @@ window.addEventListener('message', (event) => {
         $('app').setAttribute('aria-hidden', 'true');
         state = null;
     }
+    if (msg.action === 'openShop') {
+        openShop(msg.data || {});
+    }
+    if (msg.action === 'closeShop') {
+        closeShopUi();
+    }
 });
 
 document.addEventListener('click', (event) => {
-    const close = event.target.closest('#btn-close');
-    if (close) {
+    if (event.target.closest('#btn-close')) {
         nui('close');
-        if (!isFiveM) {
-            $('app').classList.add('hidden');
-        }
+        if (!isFiveM) $('app').classList.add('hidden');
         return;
     }
-    const switchBtn = event.target.closest('.nav-pills button');
+
+    if (event.target.closest('#shop-close')) {
+        nui('closeShop');
+        if (!isFiveM) closeShopUi();
+        return;
+    }
+
+    const switchBtn = event.target.closest('.pet-chip');
     if (switchBtn) {
         selectedId = switchBtn.getAttribute('data-id');
         nui('select', { petId: selectedId });
-        render();
+        renderKennel();
         return;
     }
+
+    const catBtn = event.target.closest('#shop-cats button');
+    if (catBtn) {
+        shopCategory = catBtn.getAttribute('data-cat');
+        renderShop();
+        return;
+    }
+
+    const card = event.target.closest('.shop-card');
+    if (card) {
+        shopSelected = catalogItems().find((item) => item.name === card.getAttribute('data-item')) || null;
+        renderShop();
+        return;
+    }
+
+    const buyBtn = event.target.closest('[data-buy]');
+    if (buyBtn && !buyBtn.disabled) {
+        const itemName = buyBtn.getAttribute('data-buy');
+        buying = true;
+        renderShop();
+        const finish = (res) => {
+            buying = false;
+            showToast((res && res.message) || (res && res.ok ? 'Purchased.' : 'Purchase failed.'));
+            renderShop();
+        };
+        if (!isFiveM) {
+            finish({ ok: true, message: `Preview adopt: ${itemName}` });
+            return;
+        }
+        nui('buy', { item: itemName }).then(finish);
+        return;
+    }
+
     const actionBtn = event.target.closest('.action-nav button');
     if (actionBtn && actionBtn.disabled) {
         const why = actionBtn.getAttribute('title');
@@ -390,7 +576,7 @@ document.addEventListener('click', (event) => {
                     pet.thirst = 50;
                     pet.happiness = 35;
                 }
-                render();
+                renderKennel();
             }
             return;
         }
@@ -398,8 +584,20 @@ document.addEventListener('click', (event) => {
     }
 });
 
+document.addEventListener('input', (event) => {
+    if (event.target.id === 'shop-search') {
+        shopQuery = event.target.value;
+        renderShop();
+    }
+});
+
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+        if (catalog) {
+            nui('closeShop');
+            if (!isFiveM) closeShopUi();
+            return;
+        }
         nui('close');
         if (!isFiveM) $('app').classList.add('hidden');
     }
@@ -408,7 +606,11 @@ document.addEventListener('keydown', (event) => {
 if (!isFiveM) {
     document.body.classList.add('preview');
     window.addEventListener('DOMContentLoaded', () => {
-        applyMenuBox({ top: '16px', right: '16px', width: 348 });
-        applyData(MOCK);
+        applyMenuBox({ top: '18px', right: '18px', width: 392 });
+        if (location.hash === '#shop') {
+            openShop(MOCK_CATALOG);
+        } else {
+            applyData(MOCK);
+        }
     });
 }

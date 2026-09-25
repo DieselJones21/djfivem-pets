@@ -42,7 +42,11 @@ local function spawnShop()
                 icon = 'fa-solid fa-shop',
                 label = locale('shop_browse'),
                 onSelect = function()
-                    exports.ox_inventory:openInventory('shop', { type = 'djfivem_petstore' })
+                    if Config.Shop.useCustomUI then
+                        OpenPetShop()
+                    else
+                        exports.ox_inventory:openInventory('shop', { type = 'djfivem_petstore' })
+                    end
                 end,
             },
         })
@@ -54,10 +58,14 @@ local function spawnShop()
                 if dist < 2.2 then
                     sleep = 0
                     BeginTextCommandDisplayHelp('STRING')
-                    AddTextComponentSubstringPlayerName('Press ~INPUT_CONTEXT~ to browse the pet store')
+                    AddTextComponentSubstringPlayerName('Press ~INPUT_CONTEXT~ to browse the Companion Emporium')
                     EndTextCommandDisplayHelp(0, false, false, -1)
                     if IsControlJustPressed(0, 38) then
-                        exports.ox_inventory:openInventory('shop', { type = 'djfivem_petstore' })
+                        if Config.Shop.useCustomUI then
+                            OpenPetShop()
+                        else
+                            exports.ox_inventory:openInventory('shop', { type = 'djfivem_petstore' })
+                        end
                     end
                 end
                 Wait(sleep)
