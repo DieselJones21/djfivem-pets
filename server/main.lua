@@ -118,6 +118,8 @@ local function serialize(src, item, meta)
         species = item.name,
         speciesLabel = animal.label or item.label or item.name,
         canAttack = animal.canAttack == true,
+        k9 = animal.k9 == true,
+        k9Traits = animal.k9Traits,
         category = animal.category,
         rarity = animal.rarity,
         image = ('images/%s.png'):format(item.name),
@@ -125,6 +127,7 @@ local function serialize(src, item, meta)
         collar = meta.collar == true,
         spawned = isOut,
         walking = isOut and spawned.walking or false,
+        guarding = isOut and spawned.guarding or false,
         sitting = false,
         health = Round(meta.health or 0),
         hunger = Round(meta.hunger or 0),
@@ -220,7 +223,7 @@ local function togglePet(src, item, slot)
         return
     end
 
-    Spawned[src] = { petId = meta.petId, netId = netId, walking = false }
+    Spawned[src] = { petId = meta.petId, netId = netId, walking = false, guarding = false }
     notify(src, 'success', 'pet_called', meta.name)
     refresh(src, meta.petId)
 end
@@ -371,12 +374,14 @@ end
 
 function Actions.sit(src, slot, item, meta)
     if not requireSpawned(src, meta) then return end
+    Spawned[src].guarding = false
     TriggerClientEvent('djfivem-pets:client:setSit', src, true)
     notify(src, 'inform', 'sit', meta.name)
 end
 
 function Actions.stay(src, slot, item, meta)
     if not requireSpawned(src, meta) then return end
+    Spawned[src].guarding = false
     TriggerClientEvent('djfivem-pets:client:setStay', src, true)
     notify(src, 'inform', 'stay', meta.name)
 end
@@ -389,18 +394,25 @@ function Actions.follow(src, slot, item, meta)
     end
     TriggerClientEvent('djfivem-pets:client:setSit', src, false)
     TriggerClientEvent('djfivem-pets:client:setStay', src, false)
+    Spawned[src].guarding = false
+    TriggerClientEvent('djfivem-pets:client:setGuard', src, false)
     notify(src, 'inform', 'follow', meta.name)
 end
 
 function Actions.attack(src, slot, item, meta)
-    if onCooldown(src, 'attack', Config.AttackCooldown) then
+    local animal = Config.Animals[item.name]
+    local cooldown = (IsK9Animal(animal) and Config.K9.attackCooldown) or Config.AttackCooldown
+    if onCooldown(src, 'attack', cooldown) then
         notify(src, 'error', 'attack_cooldown')
         return
     end
     if not requireSpawned(src, meta) then return end
-    local animal = Config.Animals[item.name]
     if not animal or not animal.canAttack then
         notify(src, 'error', 'attack_not_dog', meta.name)
+        return
+    end
+    if IsK9Animal(animal) and not IsK9Authorized(src) then
+        notify(src, 'error', 'k9_job_required')
         return
     end
     local target = lib.callback.await('djfivem-pets:getAttackTarget', src)
@@ -409,7 +421,8 @@ function Actions.attack(src, slot, item, meta)
         return
     end
     if target.isPlayer then
-        if not Config.AttackPlayers then
+        local allowPlayers = Config.AttackPlayers or (IsK9Animal(animal) and Config.K9.attackPlayers)
+        if not allowPlayers then
             notify(src, 'error', 'attack_players_disabled')
             return
         end
@@ -422,8 +435,51 @@ function Actions.attack(src, slot, item, meta)
         Spawned[src].walking = false
         TriggerClientEvent('djfivem-pets:client:stopWalk', src)
     end
+    TriggerClientEvent('djfivem-pets:client:setGuard', src, false)
     TriggerClientEvent('djfivem-pets:client:attack', src, target)
     notify(src, 'warning', 'attack_started', meta.name)
+end
+
+function Actions.search(src, slot, item, meta)
+    local animal = Config.Animals[item.name]
+    if not HasK9Trait(animal, 'search') then
+        notify(src, 'error', 'k9_trait_missing', meta.name)
+        return
+    end
+    if not IsK9Authorized(src) then
+        notify(src, 'error', 'k9_job_required')
+        return
+    end
+    if onCooldown(src, 'search', Config.K9.searchCooldown) then
+        notify(src, 'error', 'busy')
+        return
+    end
+    if not requireSpawned(src, meta) then return end
+    local target = lib.callback.await('djfivem-pets:getAttackTarget', src)
+    TriggerClientEvent('djfivem-pets:client:search', src, target)
+    notify(src, 'inform', 'k9_search', meta.name)
+    refresh(src, meta.petId)
+end
+
+function Actions.guard(src, slot, item, meta)
+    local animal = Config.Animals[item.name]
+    if not HasK9Trait(animal, 'guard') then
+        notify(src, 'error', 'k9_trait_missing', meta.name)
+        return
+    end
+    if not IsK9Authorized(src) then
+        notify(src, 'error', 'k9_job_required')
+        return
+    end
+    if not requireSpawned(src, meta) then return end
+    if Spawned[src].walking then
+        Spawned[src].walking = false
+        TriggerClientEvent('djfivem-pets:client:stopWalk', src)
+    end
+    Spawned[src].guarding = true
+    TriggerClientEvent('djfivem-pets:client:setGuard', src, true)
+    notify(src, 'inform', 'k9_guard', meta.name)
+    refresh(src, meta.petId)
 end
 
 function Actions.revive(src, slot, item, meta)
@@ -673,6 +729,9 @@ lib.callback.register('djfivem-pets:buyItem', function(source, itemName)
     local price = GetItemPrice(itemName)
     if not price then
         return { ok = false, message = locale('shop_unknown') }
+    end
+    if IsK9Animal(Config.Animals[itemName]) and not IsK9Authorized(source) then
+        return { ok = false, message = locale('k9_job_required') }
     end
     if not takeShopMoney(source, price) then
         return { ok = false, message = locale('shop_need_money', price) }

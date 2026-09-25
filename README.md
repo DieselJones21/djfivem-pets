@@ -4,38 +4,39 @@ A premium companion system for FiveM. Pets are **ox_inventory items** — use th
 
 ## Features
 
-- **41 companions** across dogs, puppies, cats, farm, exotic, wild, and special
+- **41 companions** across Police K9, dogs, puppies, cats, farm, exotic, wild, and special
+- **Police K9** units with attack, search, and guard commands
 - Realistic transparent inventory / HUD portraits
 - Use the pet item to **call / recall**
 - **Pet, feed, water,** sit, stay, follow
 - **Walks require a collar on the pet and a leash in your inventory**
-- Guard animals can attack a targeted ped (player attacks optional)
+- Guard animals can attack a targeted ped (K9 units can take down players by default)
 - Pets get hungry and thirsty, can **die**, and need a **revive kit**
-- Modern NUI **kennel** (default `F6`) — compact HUD in the **top-right**
-- Custom **Companion Emporium** with categories, search, and adopt cards
+- Black / red / white / blue NUI **kennel** (default `F6`) — compact HUD in the **top-right**
+- Custom **Companion Emporium** with a Police K9 section, search, and adopt cards
 - OneSync networked peds so other players can see your animal
 
 ## Roster
 
 | Item | Model | Category |
 | --- | --- | --- |
-| `pet_chop` | `A_C_Chop` | Dogs |
+| `pet_lspd` | `a_c_lspddog` | Police K9 |
+| `pet_shepherd` | `A_C_shepherd_2` | Police K9 |
+| `pet_shepherd_np` | `a_c_shepherd_np` | Police K9 |
+| `pet_doberman` | `doberman` | Police K9 |
+| `pet_dusa_doberman` | `dusa_doberman` | Police K9 |
+| `pet_cane` | `dusa_cane` | Police K9 |
+| `pet_pit` | `A_C_Pit_NP` | Police K9 |
+| `pet_chop` | `A_C_Chop` | Police K9 |
+| `pet_retriever_np` | `A_C_Retriever_np` | Police K9 |
+| `pet_husky_np` | `a_c_husky_np` | Police K9 |
 | `pet_husky` | `A_C_Husky_2` | Dogs |
 | `pet_retriever` | `A_C_Retriever_2` | Dogs |
-| `pet_shepherd` | `A_C_shepherd_2` | Dogs |
-| `pet_dusa_doberman` | `dusa_doberman` | Dogs |
 | `pet_westy` | `a_c_westy_2` | Dogs |
 | `pet_poodle` | `a_c_poodle_2` | Dogs |
-| `pet_cane` | `dusa_cane` | Dogs |
 | `pet_bulldog` | `dusa_englishbulldog` | Dogs |
 | `pet_dalmatian` | `a_c_dalmatian` | Dogs |
-| `pet_husky_np` | `a_c_husky_np` | Dogs |
-| `pet_lspd` | `a_c_lspddog` | Dogs |
-| `pet_pit` | `A_C_Pit_NP` | Dogs |
-| `pet_retriever_np` | `A_C_Retriever_np` | Dogs |
-| `pet_shepherd_np` | `a_c_shepherd_np` | Dogs |
 | `pet_chowchow` | `chowchow` | Dogs |
-| `pet_doberman` | `doberman` | Dogs |
 | `pet_dachshund` | `poprplonghairweiner` | Dogs |
 | `pet_aussiepup` | `a_c_aussiepup` | Puppies |
 | `pet_fdpuppy` | `a_c_fdpuppy` | Puppies |
@@ -104,7 +105,26 @@ Pet identity, name, collar, and needs are stored on the **item metadata**. Tradi
 2. Use the animal item to spawn it. Use that same item again to put it away.
 3. `F6` opens the kennel HUD in the top-right. You can also target the animal with ox_target.
 4. Use a **collar** on a spawned pet, then use a **leash** (or Walk in the menu) to walk them.
-5. Aim at a ped and press `G` (default) to send a guard animal after it.
+5. Aim at a ped and press `G` (default) to send a guard animal after it. Police K9 units also get **Search** and **Guard** in the kennel and on ox_target.
+
+## Police K9
+
+These working dogs sit in their own shop section and ship with attack, search, and guard:
+
+`pet_lspd`, `pet_shepherd`, `pet_shepherd_np`, `pet_doberman`, `pet_dusa_doberman`, `pet_cane`, `pet_pit`, `pet_chop`, `pet_retriever_np`, `pet_husky_np`
+
+- **Attack** sends the K9 after the aimed ped. K9 units can take down players even when `Config.AttackPlayers` is false.
+- **Search** sends them to the aimed person (or sweeps nearby) and triggers their bark/alert.
+- **Guard** holds the current position with `TaskGuardCurrentPosition`.
+
+To lock K9 purchase and commands to police jobs:
+
+```lua
+Config.K9.requireJob = true
+Config.K9.jobs = { 'police', 'sheriff', 'lspd' }
+```
+
+Ace bypass: `djfivem-pets.k9`. Optional custom job lookup: `Config.K9.getJob = function(src) ... end`.
 6. If health hits 0 from injury or neglect, the pet goes down. Use a **revive kit** before it can be called again.
 
 Admin: `/givepet [id] [species]` (`husky`, `cane`, `wolf`, `sphynx`, `pet_robot`, …). Ace: `group.admin`.

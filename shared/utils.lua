@@ -6,6 +6,52 @@ function IsSupplyItem(itemName)
     return Config.Supplies[itemName] ~= nil
 end
 
+function IsK9Animal(animal)
+    return animal and animal.k9 == true
+end
+
+function HasK9Trait(animal, trait)
+    return IsK9Animal(animal) and animal.k9Traits and animal.k9Traits[trait] == true
+end
+
+function GetPlayerJobName(src)
+    if Config.K9.getJob then
+        return Config.K9.getJob(src)
+    end
+    if src then
+        local ok, player = pcall(Player, src)
+        if ok and player and player.state then
+            local job = player.state.job
+            if type(job) == 'table' then
+                return job.name
+            end
+            if type(job) == 'string' then
+                return job
+            end
+        end
+    end
+end
+
+function IsK9Authorized(src)
+    if not Config.K9 or not Config.K9.requireJob then
+        return true
+    end
+    if src and IsPlayerAceAllowed(src, 'djfivem-pets.k9') then
+        return true
+    end
+    local job = GetPlayerJobName(src)
+    if not job then
+        return false
+    end
+    job = job:lower()
+    for i = 1, #(Config.K9.jobs or {}) do
+        if Config.K9.jobs[i]:lower() == job then
+            return true
+        end
+    end
+    return false
+end
+
 function DefaultPetMetadata(itemName)
     local animal = Config.Animals[itemName]
     if not animal then return {} end
@@ -151,6 +197,8 @@ function GetCatalog()
             rarity = animal.rarity,
             price = animal.price,
             canAttack = animal.canAttack == true,
+            k9 = animal.k9 == true,
+            k9Traits = animal.k9Traits,
             description = animal.description or '',
             image = ('images/%s.png'):format(name),
         }

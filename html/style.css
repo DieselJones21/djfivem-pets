@@ -1,23 +1,28 @@
 :root {
-    --bg: rgba(10, 11, 14, 0.78);
-    --bg-solid: #101218;
-    --card: rgba(22, 25, 32, 0.88);
-    --card-2: #1c212b;
-    --line: rgba(255, 247, 232, 0.08);
-    --text: #f6f1e8;
-    --muted: #9a9286;
-    --gold: #e8c36a;
-    --gold-dim: rgba(232, 195, 106, 0.16);
-    --sage: #8fbf8a;
-    --sage-dim: rgba(143, 191, 138, 0.16);
-    --danger: #e07a6d;
-    --danger-dim: rgba(224, 122, 109, 0.16);
+    --bg: rgba(4, 5, 8, 0.9);
+    --bg-solid: #050608;
+    --card: rgba(10, 11, 14, 0.94);
+    --card-2: #12141a;
+    --line: rgba(255, 255, 255, 0.12);
+    --text: #f5f7fb;
+    --muted: #9aa4b5;
+    --red: #e11d2e;
+    --red-dim: rgba(225, 29, 46, 0.16);
+    --blue: #2f6fed;
+    --blue-dim: rgba(47, 111, 237, 0.18);
+    --white: #f5f7fb;
+    --gold: #f5f7fb;
+    --gold-dim: rgba(255, 255, 255, 0.1);
+    --sage: #2f6fed;
+    --sage-dim: rgba(47, 111, 237, 0.18);
+    --danger: #e11d2e;
+    --danger-dim: rgba(225, 29, 46, 0.16);
     --menu-top: 18px;
     --menu-right: 18px;
     --menu-width: 392px;
     --radius: 22px;
     --radius-sm: 14px;
-    --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
     --font: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
     --display: "Outfit", "Instrument Sans", sans-serif;
 }
@@ -46,9 +51,9 @@ input {
 
 body.preview {
     background:
-        radial-gradient(circle at 18% 20%, rgba(232, 195, 106, 0.14), transparent 28%),
-        radial-gradient(circle at 80% 10%, rgba(143, 191, 138, 0.1), transparent 24%),
-        #08090c;
+        radial-gradient(circle at 16% 18%, rgba(225, 29, 46, 0.16), transparent 28%),
+        radial-gradient(circle at 82% 12%, rgba(47, 111, 237, 0.16), transparent 26%),
+        #050608;
 }
 
 .hidden {
@@ -79,6 +84,16 @@ body.preview {
     padding: 16px;
     backdrop-filter: blur(22px);
     -webkit-backdrop-filter: blur(22px);
+    overflow: hidden;
+}
+
+.livery {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red) 0 33%, var(--white) 33% 66%, var(--blue) 66%);
 }
 
 .panel-head {
@@ -86,6 +101,7 @@ body.preview {
     justify-content: space-between;
     align-items: flex-start;
     gap: 10px;
+    margin-top: 4px;
     margin-bottom: 14px;
 }
 
@@ -104,7 +120,7 @@ body.preview {
     place-items: center;
     flex-shrink: 0;
     background:
-        radial-gradient(circle at 50% 60%, rgba(255, 247, 232, 0.16), transparent 62%),
+        radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.14), transparent 62%),
         var(--card-2);
     border: 1px solid var(--line);
     overflow: hidden;
@@ -139,7 +155,7 @@ body.preview {
 }
 
 .eyebrow {
-    color: var(--gold);
+    color: var(--red);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -242,8 +258,8 @@ h1 {
 }
 
 .pet-chip.active {
-    background: var(--gold-dim);
-    border-color: rgba(232, 195, 106, 0.28);
+    background: var(--blue-dim);
+    border-color: rgba(47, 111, 237, 0.4);
     color: var(--text);
 }
 
@@ -271,8 +287,13 @@ h1 {
 }
 
 .pill.on {
-    background: var(--gold-dim);
-    color: var(--gold);
+    background: var(--blue-dim);
+    color: #c9d8ff;
+}
+
+.pill.k9 {
+    background: var(--red-dim);
+    color: #ff8b95;
 }
 
 .pill.live {
@@ -318,7 +339,7 @@ h1 {
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: #12151c;
+    background: #08090c;
     font-size: 11px;
     font-weight: 700;
 }
@@ -359,7 +380,7 @@ h1 {
     height: 100%;
     width: 0%;
     border-radius: inherit;
-    background: linear-gradient(90deg, #c9a24a, var(--gold));
+    background: linear-gradient(90deg, var(--red), var(--white), var(--blue));
 }
 
 .overview {
@@ -426,9 +447,15 @@ h1 {
 }
 
 .action-nav button.primary {
-    background: var(--gold-dim);
-    border-color: rgba(232, 195, 106, 0.2);
-    color: var(--gold);
+    background: var(--red-dim);
+    border-color: rgba(225, 29, 46, 0.28);
+    color: #ff8b95;
+}
+
+.action-nav button.k9 {
+    background: var(--blue-dim);
+    border-color: rgba(47, 111, 237, 0.28);
+    color: #c9d8ff;
 }
 
 .action-nav button:disabled {
@@ -476,6 +503,7 @@ h1 {
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     padding: 22px;
+    padding-top: 26px;
     display: grid;
     grid-template-rows: auto auto 1fr;
     gap: 14px;
@@ -544,9 +572,14 @@ h1 {
 }
 
 .shop-cats button.active {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: #1a1408;
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+}
+
+.shop-cats button[data-cat="k9"].active {
+    background: var(--blue);
+    border-color: var(--blue);
 }
 
 .shop-grid {
@@ -572,8 +605,12 @@ h1 {
 
 .shop-card:hover,
 .shop-card.active {
-    border-color: rgba(232, 195, 106, 0.35);
+    border-color: rgba(47, 111, 237, 0.45);
     transform: translateY(-2px);
+}
+
+.shop-card.k9 {
+    box-shadow: inset 0 0 0 1px rgba(225, 29, 46, 0.18);
 }
 
 .shop-card .art {
@@ -582,7 +619,7 @@ h1 {
     place-items: center;
     margin-bottom: 10px;
     border-radius: 14px;
-    background: radial-gradient(circle at 50% 70%, rgba(255, 247, 232, 0.1), transparent 68%);
+    background: radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.1), transparent 68%);
 }
 
 .shop-card img {
@@ -606,7 +643,7 @@ h1 {
 }
 
 .shop-card .price {
-    color: var(--gold);
+    color: var(--white);
     font-weight: 700;
     font-size: 12px;
 }
@@ -627,16 +664,18 @@ h1 {
     color: var(--muted);
 }
 
-.rarity.rare { color: #7eb6ff; }
-.rarity.epic { color: #c89bff; }
-.rarity.legendary { color: var(--gold); }
+.rarity.uncommon { color: var(--blue); }
+.rarity.rare { color: var(--red); }
+.rarity.epic { color: #9ec0ff; }
+.rarity.legendary { color: var(--white); }
+.rarity.k9 { color: var(--red); }
 
 .shop-detail {
     position: absolute;
     right: 18px;
     bottom: 18px;
     width: 320px;
-    background: #12151c;
+    background: #08090c;
     border: 1px solid var(--line);
     border-radius: 20px;
     padding: 16px;
@@ -649,7 +688,7 @@ h1 {
     object-fit: contain;
     margin-bottom: 10px;
     filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.4));
-    background: radial-gradient(circle at 50% 70%, rgba(255, 247, 232, 0.1), transparent 68%);
+    background: radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.1), transparent 68%);
     border-radius: 14px;
 }
 
@@ -670,8 +709,8 @@ h1 {
     border: 0;
     border-radius: 12px;
     padding: 12px 14px;
-    background: var(--gold);
-    color: #1a1408;
+    background: linear-gradient(90deg, var(--red), var(--blue));
+    color: #fff;
     font-weight: 700;
     cursor: pointer;
 }
@@ -686,7 +725,7 @@ h1 {
     left: 50%;
     bottom: 28px;
     transform: translateX(-50%);
-    background: #12151c;
+    background: #08090c;
     border: 1px solid var(--line);
     color: var(--text);
     padding: 10px 14px;

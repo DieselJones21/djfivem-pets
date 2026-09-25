@@ -11,6 +11,8 @@ const ACTIONS = [
     { id: 'stay', label: 'Stay' },
     { id: 'follow', label: 'Follow' },
     { id: 'attack', label: 'Attack' },
+    { id: 'search', label: 'Search' },
+    { id: 'guard', label: 'Guard' },
     { id: 'collar', label: 'Collar' },
     { id: 'revive', label: 'Revive' },
     { id: 'rename', label: 'Rename' },
@@ -27,6 +29,8 @@ const ICONS = {
     stay: '<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1"/></svg>',
     follow: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
     attack: '<svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 .5-4.5 4 1.5 6L12 16l-5 3.5 1.5-6L4 9.5 10 9z"/></svg>',
+    search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg>',
+    guard: '<svg viewBox="0 0 24 24"><path d="M12 4l7 3v5c0 4.2-2.8 7.4-7 9-4.2-1.6-7-4.8-7-9V7z"/></svg>',
     collar: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="5"/><circle cx="18" cy="12" r="1.5"/></svg>',
     revive: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
     rename: '<svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/></svg>',
@@ -43,10 +47,13 @@ const MOCK = {
             name: 'Brass',
             species: 'pet_cane',
             speciesLabel: 'Cane Corso',
-            category: 'dogs',
+            category: 'k9',
             rarity: 'rare',
             image: 'images/pet_cane.png',
+            k9: true,
+            k9Traits: { attack: true, search: true, guard: true },
             canAttack: true,
+            guarding: false,
             dead: false,
             collar: true,
             spawned: true,
@@ -128,12 +135,14 @@ const MOCK = {
         },
         {
             petId: 'demo-5',
-            name: 'Ridge',
-            species: 'pet_wolf',
-            speciesLabel: 'Wolf',
-            category: 'wild',
-            rarity: 'epic',
-            image: 'images/pet_wolf.png',
+            name: 'Badge',
+            species: 'pet_lspd',
+            speciesLabel: 'LSPD K9',
+            category: 'k9',
+            rarity: 'rare',
+            image: 'images/pet_lspd.png',
+            k9: true,
+            k9Traits: { attack: true, search: true, guard: true },
             canAttack: true,
             dead: false,
             collar: true,
@@ -155,6 +164,7 @@ const MOCK_CATALOG = {
     shopName: 'Companion Emporium',
     currency: 'money',
     categories: [
+        { id: 'k9', label: 'Police K9' },
         { id: 'dogs', label: 'Dogs' },
         { id: 'puppies', label: 'Puppies' },
         { id: 'cats', label: 'Cats' },
@@ -165,7 +175,9 @@ const MOCK_CATALOG = {
         { id: 'supplies', label: 'Supplies' },
     ],
     animals: [
-        { name: 'pet_cane', label: 'Cane Corso', category: 'dogs', rarity: 'rare', price: 11000, canAttack: true, description: 'An Italian mastiff built like a vault door.', image: 'images/pet_cane.png' },
+        { name: 'pet_lspd', label: 'LSPD K9', category: 'k9', rarity: 'rare', price: 14000, canAttack: true, k9: true, description: 'LSPD issued K9. Search, guard, and takedown trained.', image: 'images/pet_lspd.png' },
+        { name: 'pet_cane', label: 'Cane Corso', category: 'k9', rarity: 'rare', price: 11000, canAttack: true, k9: true, description: 'A heavy K9 mastiff used for perimeter holds.', image: 'images/pet_cane.png' },
+        { name: 'pet_shepherd', label: 'German Shepherd', category: 'k9', rarity: 'uncommon', price: 9000, canAttack: true, k9: true, description: 'The standard police shepherd.', image: 'images/pet_shepherd.png' },
         { name: 'pet_husky', label: 'Husky', category: 'dogs', rarity: 'uncommon', price: 8750, canAttack: true, description: 'A thick-coated northern working dog.', image: 'images/pet_husky.png' },
         { name: 'pet_sphynx', label: 'Sphynx', category: 'cats', rarity: 'rare', price: 6500, canAttack: false, description: 'Hairless, warm, and wildly affectionate.', image: 'images/pet_sphynx.png' },
         { name: 'pet_capybara', label: 'Capybara', category: 'exotic', rarity: 'epic', price: 16000, canAttack: false, description: 'The world\'s most relaxed roommate.', image: 'images/pet_capybara.png' },
@@ -264,7 +276,16 @@ function actionState(action, pet) {
         case 'attack':
             if (!pet.canAttack) return { disabled: true, hint: 'This companion cannot attack.' };
             if (!out) return { disabled: true, hint: 'Call your companion first.' };
-            return { disabled: false, hint: 'Aim at a target, then send them.' };
+            return { disabled: false, hint: pet.k9 ? 'Aim at a suspect, then send the K9.' : 'Aim at a target, then send them.' };
+        case 'search':
+            if (!pet.k9) return { disabled: true, hint: 'Only Police K9 units can search.' };
+            if (!out) return { disabled: true, hint: 'Call your K9 first.' };
+            return { disabled: false, hint: 'Aim at a person or let them sweep the area.' };
+        case 'guard':
+            if (!pet.k9) return { disabled: true, hint: 'Only Police K9 units can hold a perimeter.' };
+            if (!out) return { disabled: true, hint: 'Call your K9 first.' };
+            if (pet.guarding) return { disabled: true, hint: 'Already holding this position.' };
+            return { disabled: false, hint: 'Hold this ground until you call them off.' };
         case 'collar':
             if (pet.dead) return { disabled: true, hint: 'Revive them first.' };
             if (!out) return { disabled: true, hint: 'Call your companion first.' };
@@ -322,7 +343,7 @@ function renderKennel() {
     bindImage($('badge-img'), imageFor(pet), $('badge-glyph'));
     $('pet-name').textContent = pet.name;
     $('pet-meta').textContent = pet.speciesLabel;
-    $('pet-rarity').textContent = rarityLabel(pet.rarity || pet.category);
+    $('pet-rarity').textContent = pet.k9 ? 'Police K9' : rarityLabel(pet.rarity || pet.category);
     $('pet-level').textContent = pet.dead ? 'Down' : `Lv ${pet.level}`;
     $('age-label').textContent = `${pet.ageDays || 0} day${pet.ageDays === 1 ? '' : 's'} old`;
 
@@ -342,14 +363,16 @@ function renderKennel() {
     segs.push(`<span class="pill ${pet.spawned ? 'on' : ''}">${pet.spawned ? 'Out' : 'Home'}</span>`);
     if (pet.collar) segs.push('<span class="pill on">Collar</span>');
     if (pet.walking) segs.push('<span class="pill on">Leash</span>');
-    if (pet.canAttack) segs.push('<span class="pill">Guard</span>');
+    if (pet.k9) segs.push('<span class="pill k9">K9</span>');
+    if (pet.canAttack) segs.push(`<span class="pill ${pet.k9 ? 'k9' : ''}">${pet.k9 ? 'Takedown' : 'Guard'}</span>`);
+    if (pet.guarding) segs.push('<span class="pill on">Holding</span>');
     $('chips').innerHTML = segs.join('');
 
     const stats = [
-        ['Health', pet.health, '#8fbf8a'],
-        ['Hunger', pet.hunger, '#e8c36a'],
-        ['Thirst', pet.thirst, '#7eb6ff'],
-        ['Mood', pet.happiness, '#c89bff'],
+        ['Health', pet.health, '#f5f7fb'],
+        ['Hunger', pet.hunger, '#e11d2e'],
+        ['Thirst', pet.thirst, '#2f6fed'],
+        ['Mood', pet.happiness, '#9ec0ff'],
     ];
     $('stats').innerHTML = stats.map(([label, value, tone]) => {
         const n = Math.round(value);
@@ -367,15 +390,19 @@ function renderKennel() {
     $('bond-fill').style.width = `${Math.max(0, Math.min(100, bond))}%`;
 
     let hint = '';
-    $('actions').innerHTML = ACTIONS.map((action) => {
+    const visible = ACTIONS.filter((action) => {
+        if (action.id === 'search' || action.id === 'guard') return pet.k9;
+        return true;
+    });
+    $('actions').innerHTML = visible.map((action) => {
         const info = actionState(action.id, pet);
         if (info.hint && !info.disabled && !hint) hint = info.hint;
         if (info.disabled && info.hint && action.id === 'walk' && !pet.collar) hint = info.hint;
-        const primary = action.id === 'toggle' ? 'primary' : '';
+        const extra = action.id === 'toggle' ? 'primary' : (action.id === 'attack' || action.id === 'search' || action.id === 'guard') && pet.k9 ? 'k9' : '';
         const label = action.id === 'toggle'
             ? (pet.spawned ? 'Home' : 'Call')
             : action.label;
-        return `<button type="button" class="${primary}" data-action="${action.id}" ${info.disabled ? 'disabled' : ''} title="${info.hint || ''}">${ICONS[action.id] || ''}${label}</button>`;
+        return `<button type="button" class="${extra}" data-action="${action.id}" ${info.disabled ? 'disabled' : ''} title="${info.hint || ''}">${ICONS[action.id] || ''}${label}</button>`;
     }).join('');
     $('hint').textContent = hint;
 }
@@ -421,14 +448,14 @@ function renderShop() {
 
     const items = filteredCatalog();
     $('shop-grid').innerHTML = items.map((item) => `
-        <button type="button" class="shop-card ${shopSelected && shopSelected.name === item.name ? 'active' : ''}" data-item="${item.name}">
+        <button type="button" class="shop-card ${item.k9 ? 'k9' : ''} ${shopSelected && shopSelected.name === item.name ? 'active' : ''}" data-item="${item.name}">
             <div class="art"><img alt="" src="${item.image}" onerror="this.style.display='none'" /></div>
             <div class="meta">
                 <h3>${item.label}</h3>
                 <span class="price">${money(item.price)}</span>
             </div>
-            <p>${item.category === 'supplies' ? 'Supply' : item.canAttack ? 'Can guard' : 'Companion'}</p>
-            <span class="rarity ${item.rarity || ''}">${rarityLabel(item.rarity)}</span>
+            <p>${item.category === 'supplies' ? 'Supply' : item.k9 ? 'K9 · Attack / Search / Guard' : item.canAttack ? 'Can guard' : 'Companion'}</p>
+            <span class="rarity ${item.k9 ? 'k9' : (item.rarity || '')}">${item.k9 ? 'Police K9' : rarityLabel(item.rarity)}</span>
         </button>
     `).join('') || '<p class="hint">No companions match that search.</p>';
 
@@ -441,7 +468,7 @@ function renderShop() {
     detail.classList.remove('hidden');
     detail.innerHTML = `
         <img alt="" src="${shopSelected.image}" onerror="this.style.display='none'" />
-        <span class="rarity ${shopSelected.rarity || ''}">${rarityLabel(shopSelected.rarity)}</span>
+        <span class="rarity ${shopSelected.k9 ? 'k9' : (shopSelected.rarity || '')}">${shopSelected.k9 ? 'Police K9' : rarityLabel(shopSelected.rarity)}</span>
         <h3>${shopSelected.label}</h3>
         <p>${shopSelected.description}</p>
         <button class="buy-btn" type="button" data-buy="${shopSelected.name}" ${buying ? 'disabled' : ''}>
@@ -569,6 +596,9 @@ document.addEventListener('click', (event) => {
                 if (action === 'walk' && pet.collar) pet.walking = true;
                 if (action === 'unwalk') pet.walking = false;
                 if (action === 'collar') pet.collar = true;
+                if (action === 'guard') pet.guarding = true;
+                if (action === 'search') pet.happiness = Math.min(100, pet.happiness + 4);
+                if (action === 'follow' || action === 'toggle') pet.guarding = false;
                 if (action === 'revive') {
                     pet.dead = false;
                     pet.health = 55;

@@ -81,7 +81,17 @@ Config.Shop = {
     },
 }
 
+Config.K9 = {
+    attackPlayers = true,
+    attackCooldown = 4500,
+    searchCooldown = 6000,
+    guardRadius = 8.0,
+    requireJob = false,
+    jobs = { 'police', 'sheriff', 'lspd', 'bcso', 'sasp' },
+}
+
 Config.Categories = {
+    { id = 'k9', label = 'Police K9' },
     { id = 'dogs', label = 'Dogs' },
     { id = 'puppies', label = 'Puppies' },
     { id = 'cats', label = 'Cats' },
@@ -116,7 +126,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_ROTTWEILER',
         scale = 1.0,
         collar = COLLAR_LARGE,
-        description = 'Franklin\'s legendary rottweiler. Loyal, loud, and built for trouble.',
+        description = 'A department-grade rottweiler. Bite work first, loyalty always.',
     },
     pet_husky = {
         label = 'Husky',
@@ -167,7 +177,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_SHEPHERD',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'A classic working shepherd. Sharp, obedient, and always on watch.',
+        description = 'The standard police shepherd. Tracks, holds, and takes a suspect down on command.',
     },
     pet_dusa_doberman = {
         label = 'Dusa Doberman',
@@ -184,7 +194,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_SHEPHERD',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'Sleek, sculpted, and fiercely loyal. A show-line guardian.',
+        description = 'A protection-line Doberman used for patrol and suspect apprehension.',
     },
     pet_westy = {
         label = 'West Highland Terrier',
@@ -252,7 +262,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_ROTTWEILER',
         scale = 1.0,
         collar = COLLAR_LARGE,
-        description = 'An Italian mastiff built like a vault door. Calm until it isn\'t.',
+        description = 'A heavy K9 mastiff. Holds ground, guards a perimeter, and does not back down.',
     },
     pet_bulldog = {
         label = 'English Bulldog',
@@ -354,7 +364,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_RETRIEVER',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'A northern pack dog with ice-blue eyes and a runaway streak.',
+        description = 'A working husky used for tracking and cold-weather patrols.',
     },
     pet_lspd = {
         label = 'LSPD K9',
@@ -371,7 +381,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_SHEPHERD',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'Department-trained and street-ready. The badge is optional. The bite is not.',
+        description = 'LSPD issued K9. Search, guard, and takedown trained.',
     },
     pet_pit = {
         label = 'Pit Bull',
@@ -388,7 +398,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_ROTTWEILER',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'A muscular companion with a velvet head and a steel work ethic.',
+        description = 'A patrol pit used for holds and close-quarters takedowns.',
     },
     pet_pitpup = {
         label = 'Pit Bull Puppy',
@@ -439,7 +449,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_RETRIEVER',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'A field-bred retriever with a sunny coat and a water-loving grin.',
+        description = 'A detection retriever. Used for searches, articles, and suspect tracking.',
     },
     pet_rotpuppy = {
         label = 'Rottweiler Puppy',
@@ -473,7 +483,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_SHEPHERD',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'A sable working line shepherd. Focused, athletic, and endlessly trainable.',
+        description = 'A sable patrol shepherd. Fast on a track and reliable on a bite command.',
     },
     pet_bostonpup = {
         label = 'Boston Terrier Puppy',
@@ -728,7 +738,7 @@ Config.Animals = {
         barkScenario = 'WORLD_DOG_BARKING_SHEPHERD',
         scale = 1.0,
         collar = COLLAR_DOG,
-        description = 'A polished protector. Fast, focused, and always one step ahead.',
+        description = 'A patrol Doberman. Search, guard, and takedown certified.',
     },
     pet_dachshund = {
         label = 'Longhair Dachshund',
@@ -800,6 +810,30 @@ Config.Animals = {
         description = 'A silk-haired scrap of confidence that believes it owns the block.',
     },
 }
+
+local K9_TRAITS = { attack = true, search = true, guard = true }
+Config.K9Units = {
+    'pet_lspd',
+    'pet_shepherd',
+    'pet_shepherd_np',
+    'pet_doberman',
+    'pet_dusa_doberman',
+    'pet_cane',
+    'pet_pit',
+    'pet_chop',
+    'pet_retriever_np',
+    'pet_husky_np',
+}
+
+for i = 1, #Config.K9Units do
+    local animal = Config.Animals[Config.K9Units[i]]
+    if animal then
+        animal.category = 'k9'
+        animal.k9 = true
+        animal.canAttack = true
+        animal.k9Traits = K9_TRAITS
+    end
+end
 
 Config.Supplies = {
     pet_food = {
