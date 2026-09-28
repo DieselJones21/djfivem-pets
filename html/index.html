@@ -3,12 +3,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Companion</title>
+    <title>City of Dreams</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <section id="app" class="panel hidden" role="dialog" aria-labelledby="pet-name" aria-hidden="true">
         <div class="livery" aria-hidden="true"></div>
+        <div class="brand">
+            <img class="brand-logo" src="images/cod_logo.png" alt="City of Dreams" />
+            <div class="brand-copy">
+                <p class="brand-name">City of Dreams</p>
+                <p class="brand-tag">Companion Kennel</p>
+            </div>
+            <button id="btn-close" class="icon-btn" type="button" aria-label="Close">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+        </div>
         <header class="panel-head">
             <div class="profile">
                 <div id="badge" class="avatar">
@@ -21,9 +31,6 @@
                     <p class="rank"><span id="pet-meta">Husky</span> · <span id="pet-level">Lv 1</span></p>
                 </div>
             </div>
-            <button id="btn-close" class="icon-btn" type="button" aria-label="Close">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-            </button>
         </header>
 
         <nav id="pet-switcher" class="pet-rail" aria-label="Your companions"></nav>
