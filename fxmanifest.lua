@@ -4,8 +4,8 @@ lua54 'yes'
 
 name 'djfivem-pets'
 author 'DieselJones21'
-description 'Premium companion system with 41 animals, needs, walks, a modern kennel HUD, and a custom emporium'
-version '2.0.0'
+description 'Donator companion system with 41 animals, K9 commands, needs, and a polished kennel HUD'
+version '2.2.0'
 
 ox_lib 'locale'
 
@@ -20,7 +20,6 @@ client_scripts {
     'client/leash.lua',
     'client/target.lua',
     'client/nui.lua',
-    'client/shop.lua',
 }
 
 server_scripts {

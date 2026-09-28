@@ -160,47 +160,8 @@ const MOCK = {
     ],
 };
 
-const MOCK_CATALOG = {
-    shopName: 'Companion Emporium',
-    currency: 'money',
-    categories: [
-        { id: 'k9', label: 'Police K9' },
-        { id: 'dogs', label: 'Dogs' },
-        { id: 'puppies', label: 'Puppies' },
-        { id: 'cats', label: 'Cats' },
-        { id: 'farm', label: 'Farm' },
-        { id: 'exotic', label: 'Exotic' },
-        { id: 'wild', label: 'Wild' },
-        { id: 'special', label: 'Special' },
-        { id: 'supplies', label: 'Supplies' },
-    ],
-    animals: [
-        { name: 'pet_lspd', label: 'LSPD K9', category: 'k9', rarity: 'rare', price: 14000, canAttack: true, k9: true, description: 'LSPD issued K9. Search, guard, and takedown trained.', image: 'images/pet_lspd.png' },
-        { name: 'pet_cane', label: 'Cane Corso', category: 'k9', rarity: 'rare', price: 11000, canAttack: true, k9: true, description: 'A heavy K9 mastiff used for perimeter holds.', image: 'images/pet_cane.png' },
-        { name: 'pet_shepherd', label: 'German Shepherd', category: 'k9', rarity: 'uncommon', price: 9000, canAttack: true, k9: true, description: 'The standard police shepherd.', image: 'images/pet_shepherd.png' },
-        { name: 'pet_husky', label: 'Husky', category: 'dogs', rarity: 'uncommon', price: 8750, canAttack: true, description: 'A thick-coated northern working dog.', image: 'images/pet_husky.png' },
-        { name: 'pet_sphynx', label: 'Sphynx', category: 'cats', rarity: 'rare', price: 6500, canAttack: false, description: 'Hairless, warm, and wildly affectionate.', image: 'images/pet_sphynx.png' },
-        { name: 'pet_capybara', label: 'Capybara', category: 'exotic', rarity: 'epic', price: 16000, canAttack: false, description: 'The world\'s most relaxed roommate.', image: 'images/pet_capybara.png' },
-        { name: 'pet_wolf', label: 'Wolf', category: 'wild', rarity: 'epic', price: 17000, canAttack: true, description: 'A timber wolf with a low howl.', image: 'images/pet_wolf.png' },
-        { name: 'pet_yorkie', label: 'Yorkshire Terrier Puppy', category: 'puppies', rarity: 'common', price: 3900, canAttack: true, description: 'A silk-haired scrap of confidence.', image: 'images/pet_yorkie.png' },
-        { name: 'pet_robot', label: 'Zathura', category: 'special', rarity: 'legendary', price: 25000, canAttack: true, description: 'A compact companion automaton.', image: 'images/pet_robot.png' },
-    ],
-    supplies: [
-        { name: 'pet_food', label: 'Premium Kibble', category: 'supplies', rarity: 'common', price: 25, description: 'Slow-baked kibble.', image: 'images/pet_food.png' },
-        { name: 'pet_water', label: 'Fresh Water', category: 'supplies', rarity: 'common', price: 20, description: 'Clean drinking water.', image: 'images/pet_water.png' },
-        { name: 'pet_collar', label: 'Leather Collar', category: 'supplies', rarity: 'common', price: 150, description: 'Required before walking.', image: 'images/pet_collar.png' },
-        { name: 'pet_leash', label: 'Walking Leash', category: 'supplies', rarity: 'common', price: 125, description: 'Keep this on you to walk.', image: 'images/pet_leash.png' },
-        { name: 'pet_revive', label: 'Revive Kit', category: 'supplies', rarity: 'common', price: 750, description: 'Field medicine for a downed pet.', image: 'images/pet_revive.png' },
-    ],
-};
-
 let state = null;
 let selectedId = null;
-let catalog = null;
-let shopCategory = 'all';
-let shopQuery = '';
-let shopSelected = null;
-let buying = false;
 
 function resourceName() {
     return isFiveM ? GetParentResourceName() : 'djfivem-pets';
@@ -208,7 +169,6 @@ function resourceName() {
 
 function nui(name, payload) {
     if (!isFiveM) {
-        console.log('[preview nui]', name, payload);
         return Promise.resolve({ ok: true });
     }
     return fetch(`https://${resourceName()}/${name}`, {
@@ -232,10 +192,6 @@ function imageFor(pet) {
 
 function rarityLabel(value) {
     return (value || 'companion').replace(/_/g, ' ');
-}
-
-function money(value) {
-    return `$${Number(value || 0).toLocaleString('en-US')}`;
 }
 
 function selectedPet() {
@@ -325,12 +281,18 @@ function bindImage(img, src, fallbackEl) {
     img.src = src;
 }
 
+function hideKennel() {
+    const app = $('app');
+    app.classList.add('hidden');
+    app.setAttribute('aria-hidden', 'true');
+    state = null;
+}
+
 function renderKennel() {
     const pet = selectedPet();
     const app = $('app');
     if (!pet) {
-        app.classList.add('hidden');
-        app.setAttribute('aria-hidden', 'true');
+        hideKennel();
         return;
     }
 
@@ -338,7 +300,6 @@ function renderKennel() {
     app.setAttribute('aria-hidden', 'false');
 
     const glyph = glyphFor(pet.speciesLabel || pet.name);
-    $('badge').style.background = '';
     $('badge-glyph').textContent = glyph;
     bindImage($('badge-img'), imageFor(pet), $('badge-glyph'));
     $('pet-name').textContent = pet.name;
@@ -364,15 +325,15 @@ function renderKennel() {
     if (pet.collar) segs.push('<span class="pill on">Collar</span>');
     if (pet.walking) segs.push('<span class="pill on">Leash</span>');
     if (pet.k9) segs.push('<span class="pill k9">K9</span>');
-    if (pet.canAttack) segs.push(`<span class="pill ${pet.k9 ? 'k9' : ''}">${pet.k9 ? 'Takedown' : 'Guard'}</span>`);
+    if (pet.canAttack) segs.push(`<span class="pill ${pet.k9 ? 'k9' : 'on'}">${pet.k9 ? 'Takedown' : 'Guard'}</span>`);
     if (pet.guarding) segs.push('<span class="pill on">Holding</span>');
     $('chips').innerHTML = segs.join('');
 
     const stats = [
-        ['Health', pet.health, '#f5f7fb'],
+        ['Health', pet.health, '#f6f3f0'],
         ['Hunger', pet.hunger, '#e11d2e'],
-        ['Thirst', pet.thirst, '#2f6fed'],
-        ['Mood', pet.happiness, '#9ec0ff'],
+        ['Thirst', pet.thirst, '#f97316'],
+        ['Mood', pet.happiness, '#fb923c'],
     ];
     $('stats').innerHTML = stats.map(([label, value, tone]) => {
         const n = Math.round(value);
@@ -384,9 +345,8 @@ function renderKennel() {
         `;
     }).join('');
 
-    const bondMax = 100;
     const bond = Math.round(pet.bond || 0);
-    $('bond-label').textContent = pet.dead ? 'Recover first' : `Lv ${pet.level} · ${bond}/${bondMax}`;
+    $('bond-label').textContent = pet.dead ? 'Recover first' : `Lv ${pet.level} · ${bond}/100`;
     $('bond-fill').style.width = `${Math.max(0, Math.min(100, bond))}%`;
 
     let hint = '';
@@ -415,94 +375,6 @@ function applyData(data) {
     renderKennel();
 }
 
-function catalogItems() {
-    if (!catalog) return [];
-    return [...(catalog.animals || []), ...(catalog.supplies || [])];
-}
-
-function filteredCatalog() {
-    const query = shopQuery.trim().toLowerCase();
-    return catalogItems().filter((item) => {
-        if (shopCategory !== 'all' && item.category !== shopCategory) return false;
-        if (!query) return true;
-        return item.label.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
-    });
-}
-
-function renderShop() {
-    const shop = $('shop');
-    if (!catalog) {
-        shop.classList.add('hidden');
-        shop.setAttribute('aria-hidden', 'true');
-        return;
-    }
-
-    shop.classList.remove('hidden');
-    shop.setAttribute('aria-hidden', 'false');
-    $('shop-title').textContent = catalog.shopName || 'Companion Emporium';
-
-    const cats = [{ id: 'all', label: 'All' }, ...(catalog.categories || [])];
-    $('shop-cats').innerHTML = cats.map((cat) => (
-        `<button type="button" class="${shopCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}">${cat.label}</button>`
-    )).join('');
-
-    const items = filteredCatalog();
-    $('shop-grid').innerHTML = items.map((item) => `
-        <button type="button" class="shop-card ${item.k9 ? 'k9' : ''} ${shopSelected && shopSelected.name === item.name ? 'active' : ''}" data-item="${item.name}">
-            <div class="art"><img alt="" src="${item.image}" onerror="this.style.display='none'" /></div>
-            <div class="meta">
-                <h3>${item.label}</h3>
-                <span class="price">${money(item.price)}</span>
-            </div>
-            <p>${item.category === 'supplies' ? 'Supply' : item.k9 ? 'K9 · Attack / Search / Guard' : item.canAttack ? 'Can guard' : 'Companion'}</p>
-            <span class="rarity ${item.k9 ? 'k9' : (item.rarity || '')}">${item.k9 ? 'Police K9' : rarityLabel(item.rarity)}</span>
-        </button>
-    `).join('') || '<p class="hint">No companions match that search.</p>';
-
-    const detail = $('shop-detail');
-    if (!shopSelected) {
-        detail.classList.add('hidden');
-        return;
-    }
-
-    detail.classList.remove('hidden');
-    detail.innerHTML = `
-        <img alt="" src="${shopSelected.image}" onerror="this.style.display='none'" />
-        <span class="rarity ${shopSelected.k9 ? 'k9' : (shopSelected.rarity || '')}">${shopSelected.k9 ? 'Police K9' : rarityLabel(shopSelected.rarity)}</span>
-        <h3>${shopSelected.label}</h3>
-        <p>${shopSelected.description}</p>
-        <button class="buy-btn" type="button" data-buy="${shopSelected.name}" ${buying ? 'disabled' : ''}>
-            ${buying ? 'Purchasing…' : `Adopt · ${money(shopSelected.price)}`}
-        </button>
-    `;
-}
-
-function openShop(data) {
-    catalog = data;
-    shopCategory = 'all';
-    shopQuery = '';
-    shopSelected = (data.animals && data.animals[0]) || null;
-    $('shop-search').value = '';
-    renderShop();
-}
-
-function closeShopUi() {
-    $('shop').classList.add('hidden');
-    $('shop').setAttribute('aria-hidden', 'true');
-    catalog = null;
-    shopSelected = null;
-}
-
-function showToast(text) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = text;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2400);
-}
-
 window.addEventListener('message', (event) => {
     const msg = event.data || {};
     if (msg.action === 'open' || msg.action === 'update') {
@@ -510,28 +382,14 @@ window.addEventListener('message', (event) => {
         applyData(msg.data);
     }
     if (msg.action === 'close') {
-        $('app').classList.add('hidden');
-        $('app').setAttribute('aria-hidden', 'true');
-        state = null;
-    }
-    if (msg.action === 'openShop') {
-        openShop(msg.data || {});
-    }
-    if (msg.action === 'closeShop') {
-        closeShopUi();
+        hideKennel();
     }
 });
 
 document.addEventListener('click', (event) => {
     if (event.target.closest('#btn-close')) {
         nui('close');
-        if (!isFiveM) $('app').classList.add('hidden');
-        return;
-    }
-
-    if (event.target.closest('#shop-close')) {
-        nui('closeShop');
-        if (!isFiveM) closeShopUi();
+        if (!isFiveM) hideKennel();
         return;
     }
 
@@ -540,38 +398,6 @@ document.addEventListener('click', (event) => {
         selectedId = switchBtn.getAttribute('data-id');
         nui('select', { petId: selectedId });
         renderKennel();
-        return;
-    }
-
-    const catBtn = event.target.closest('#shop-cats button');
-    if (catBtn) {
-        shopCategory = catBtn.getAttribute('data-cat');
-        renderShop();
-        return;
-    }
-
-    const card = event.target.closest('.shop-card');
-    if (card) {
-        shopSelected = catalogItems().find((item) => item.name === card.getAttribute('data-item')) || null;
-        renderShop();
-        return;
-    }
-
-    const buyBtn = event.target.closest('[data-buy]');
-    if (buyBtn && !buyBtn.disabled) {
-        const itemName = buyBtn.getAttribute('data-buy');
-        buying = true;
-        renderShop();
-        const finish = (res) => {
-            buying = false;
-            showToast((res && res.message) || (res && res.ok ? 'Purchased.' : 'Purchase failed.'));
-            renderShop();
-        };
-        if (!isFiveM) {
-            finish({ ok: true, message: `Preview adopt: ${itemName}` });
-            return;
-        }
-        nui('buy', { item: itemName }).then(finish);
         return;
     }
 
@@ -614,22 +440,10 @@ document.addEventListener('click', (event) => {
     }
 });
 
-document.addEventListener('input', (event) => {
-    if (event.target.id === 'shop-search') {
-        shopQuery = event.target.value;
-        renderShop();
-    }
-});
-
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-        if (catalog) {
-            nui('closeShop');
-            if (!isFiveM) closeShopUi();
-            return;
-        }
         nui('close');
-        if (!isFiveM) $('app').classList.add('hidden');
+        if (!isFiveM) hideKennel();
     }
 });
 
@@ -637,10 +451,6 @@ if (!isFiveM) {
     document.body.classList.add('preview');
     window.addEventListener('DOMContentLoaded', () => {
         applyMenuBox({ top: '18px', right: '18px', width: 392 });
-        if (location.hash === '#shop') {
-            openShop(MOCK_CATALOG);
-        } else {
-            applyData(MOCK);
-        }
+        applyData(MOCK);
     });
 }

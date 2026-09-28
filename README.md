@@ -1,6 +1,8 @@
 # djfivem-pets
 
-A premium companion system for FiveM. Pets are **ox_inventory items** — use the animal item to call or recall it. Feeding, watering, walking, collars, leashes, death, and revive are item-driven. A glass kennel HUD and a custom **Companion Emporium** shop are included.
+A donator companion system for FiveM. Pets are **ox_inventory items** — staff grant them with `/givepet` (or your Tebex pack). Use the animal item to call or recall it. Feeding, watering, walking, collars, leashes, death, and revive are item-driven. Open the kennel HUD with `/petmenu`.
+
+There is **no in-city pet store**. Companions and supplies are donator / admin-given only.
 
 ## Features
 
@@ -12,8 +14,7 @@ A premium companion system for FiveM. Pets are **ox_inventory items** — use th
 - **Walks require a collar on the pet and a leash in your inventory**
 - Guard animals can attack a targeted ped (K9 units can take down players by default)
 - Pets get hungry and thirsty, can **die**, and need a **revive kit**
-- Black / red / white / blue NUI **kennel** (default `F6`) — compact HUD in the **top-right**
-- Custom **Companion Emporium** with a Police K9 section, search, and adopt cards
+- Black kennel HUD with a red–orange gradient, opened with **`/petmenu`** (top-right, no fullscreen overlay)
 - OneSync networked peds so other players can see your animal
 
 ## Roster
@@ -88,8 +89,6 @@ ensure djfivem-pets
 
 Remove any old entries such as `pet_cat`, `pet_pug`, `pet_monkey`, `pet_coyote`, `pet_mtlion`, `pet_rabbit`, or `pet_rottweiler` if they are still in your items file.
 
-The shop charges the `money` item by default. Change `Config.Shop.currency.item` if your economy uses a different ox_inventory cash item. Set `Config.Shop.useCustomUI = false` to fall back to the default ox_inventory shop.
-
 Supplies:
 
 | Item | Use |
@@ -104,15 +103,18 @@ Pet identity, name, collar, and needs are stored on the **item metadata**. Tradi
 
 ## How to play
 
-1. Buy a companion and supplies at the **Companion Emporium** (Harmony, near YouTool — move it in `config.lua`).
+1. Receive a companion (and supplies) from staff or your donator pack. Admins: `/givepet [id] [species]`.
 2. Use the animal item to spawn it. Use that same item again to put it away.
-3. `F6` opens the kennel HUD in the top-right. You can also target the animal with ox_target.
+3. `/petmenu` opens the kennel HUD in the top-right. You can also target the animal with ox_target.
 4. Use a **collar** on a spawned pet, then use a **leash** (or Walk in the menu) to walk them.
 5. Aim at a ped and press `G` (default) to send a guard animal after it. Police K9 units also get **Search** and **Guard** in the kennel and on ox_target.
+6. If health hits 0 from injury or neglect, the pet goes down. Use a **revive kit** before it can be called again.
+
+Ace for `/givepet`: `group.admin`. Species aliases work (`husky`, `cane`, `wolf`, `sphynx`, `pet_robot`, …).
 
 ## Police K9
 
-These working dogs sit in their own shop section and ship with attack, search, and guard:
+These working dogs ship with attack, search, and guard:
 
 `pet_lspd`, `pet_shepherd`, `pet_shepherd_np`, `pet_doberman`, `pet_dusa_doberman`, `pet_cane`, `pet_pit`, `pet_chop`, `pet_retriever_np`, `pet_husky_np`
 
@@ -120,7 +122,7 @@ These working dogs sit in their own shop section and ship with attack, search, a
 - **Search** sends them to the aimed person (or sweeps nearby) and triggers their bark/alert.
 - **Guard** holds the current position with `TaskGuardCurrentPosition`.
 
-To lock K9 purchase and commands to police jobs:
+To lock K9 commands to police jobs:
 
 ```lua
 Config.K9.requireJob = true
@@ -128,17 +130,12 @@ Config.K9.jobs = { 'police', 'sheriff', 'lspd' }
 ```
 
 Ace bypass: `djfivem-pets.k9`. Optional custom job lookup: `Config.K9.getJob = function(src) ... end`.
-6. If health hits 0 from injury or neglect, the pet goes down. Use a **revive kit** before it can be called again.
-
-Admin: `/givepet [id] [species]` (`husky`, `cane`, `wolf`, `sphynx`, `pet_robot`, …). Ace: `group.admin`.
 
 ## Config
 
-Edit `config.lua` for shop location, currency, prices, decay, attack-players, vehicle warping, and per-animal models.
+Edit `config.lua` for decay, attack-players, vehicle warping, and per-animal models.
 
 ## Keys
 
-Players can rebind these in ox_lib keybinds:
-
-- Pet menu: `F6`
-- Pet attack: `G`
+- Kennel: `/petmenu` (no menu keybind)
+- Pet attack: `G` (rebindable in ox_lib keybinds)

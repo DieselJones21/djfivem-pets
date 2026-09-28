@@ -11,6 +11,13 @@ LocalPet = {
 }
 
 local collarObject = 0
+local followTask = { speed = -1, at = 0 }
+
+local function resetFollowTask()
+    followTask.speed = -1
+    followTask.at = 0
+end
+
 
 local function dbg(...)
     if Config.Debug then
@@ -100,7 +107,9 @@ function DespawnLocalPet()
     LocalPet.sitting = false
     LocalPet.attacking = false
     LocalPet.guarding = false
+    resetFollowTask()
 end
+
 
 local function placeOnGround(ped)
     local c = GetEntityCoords(ped)
@@ -171,7 +180,10 @@ function SpawnLocalPet(meta)
     end
 
     AddPetTarget(ped)
+    resetFollowTask()
     TaskFollowToOffsetOfEntity(ped, playerPed, 0.9, 0.0, 0.0, 5.0, -1, Config.FollowDistance, true)
+    followTask.speed = 5.0
+    followTask.at = GetGameTimer()
     dbg('spawned', meta.species, netId)
     return netId
 end
@@ -220,8 +232,14 @@ local function followOwner()
         local coords = GetOffsetFromEntityInWorldCoords(playerPed, 0.4, 1.4, 0.0)
         SetEntityCoords(LocalPet.ped, coords.x, coords.y, coords.z, false, false, false, false)
         placeOnGround(LocalPet.ped)
+        resetFollowTask()
     elseif dist > followDist then
-        TaskFollowToOffsetOfEntity(LocalPet.ped, playerPed, 0.8, 0.0, 0.0, speed, -1, followDist, true)
+        local now = GetGameTimer()
+        if followTask.speed ~= speed or (now - followTask.at) > 1400 then
+            TaskFollowToOffsetOfEntity(LocalPet.ped, playerPed, 0.8, 0.0, 0.0, speed, -1, followDist, true)
+            followTask.speed = speed
+            followTask.at = now
+        end
     end
 end
 
@@ -231,6 +249,7 @@ function SetPetStay(stay)
     LocalPet.sitting = false
     if stay then
         LocalPet.guarding = false
+        resetFollowTask()
         ClearPedTasks(LocalPet.ped)
         TaskStandStill(LocalPet.ped, -1)
     else
@@ -243,6 +262,7 @@ function SetPetSit(sit)
     LocalPet.sitting = sit
     LocalPet.staying = sit
     LocalPet.guarding = false
+    resetFollowTask()
     ClearPedTasks(LocalPet.ped)
     if not sit then
         followOwner()
@@ -318,6 +338,7 @@ function CommandAttack(target)
     LocalPet.sitting = false
     LocalPet.guarding = false
     LocalPet.attacking = true
+    resetFollowTask()
     ClearPedTasks(LocalPet.ped)
     TaskCombatPed(LocalPet.ped, target, 0, 16)
 
@@ -342,6 +363,7 @@ function SetPetGuard(guard)
     LocalPet.staying = LocalPet.guarding
     LocalPet.sitting = false
     LocalPet.attacking = false
+    resetFollowTask()
     ClearPedTasks(LocalPet.ped)
 
     if not LocalPet.guarding then
@@ -368,6 +390,7 @@ function CommandSearch(target)
     LocalPet.sitting = false
     LocalPet.guarding = false
     LocalPet.attacking = false
+    resetFollowTask()
     ClearPedTasks(LocalPet.ped)
 
     if target and target ~= 0 and DoesEntityExist(target) then
@@ -397,7 +420,7 @@ CreateThread(function()
     while true do
         local sleep = 750
         if IsLocalPetOut() then
-            sleep = 400
+            sleep = LocalPet.walking and 500 or 650
             local playerPed = PlayerPedId()
             local inVehicle = IsPedInAnyVehicle(playerPed, false)
 

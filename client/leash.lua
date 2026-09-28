@@ -1,13 +1,18 @@
 local rope = 0
 local leashActive = false
+local texturesReady = false
 
 local function loadRopeTextures()
+    if texturesReady and RopeAreTexturesLoaded() then
+        return true
+    end
     RopeLoadTextures()
     local timeout = GetGameTimer() + 3000
     while not RopeAreTexturesLoaded() do
         if GetGameTimer() > timeout then return false end
-        Wait(10)
+        Wait(20)
     end
+    texturesReady = true
     return true
 end
 
@@ -26,7 +31,6 @@ function StartLeash()
     if not loadRopeTextures() then return false end
 
     local playerPed = PlayerPedId()
-    local pet = LocalPet.ped
     local pcoords = GetEntityCoords(playerPed)
     local length = Config.Leash.length
 
@@ -38,6 +42,9 @@ function StartLeash()
     LocalPet.sitting = false
     leashActive = true
 
+    local handBone = GetPedBoneIndex(playerPed, 57005)
+    local neckBone = GetPedBoneIndex(LocalPet.ped, 39317)
+
     CreateThread(function()
         while leashActive and IsLocalPetOut() and rope ~= 0 do
             local owner = PlayerPedId()
@@ -48,15 +55,13 @@ function StartLeash()
                 break
             end
 
-            local handBone = GetPedBoneIndex(owner, 57005)
-            local neckBone = GetPedBoneIndex(animal, 39317)
             local hand = GetWorldPositionOfEntityBone(owner, handBone)
             local neck = GetWorldPositionOfEntityBone(animal, neckBone)
             if hand.x == 0.0 then hand = GetOffsetFromEntityInWorldCoords(owner, 0.2, 0.2, 0.35) end
             if neck.x == 0.0 then neck = GetOffsetFromEntityInWorldCoords(animal, 0.0, 0.15, 0.35) end
 
-            AttachEntitiesToRope(rope, owner, animal, hand.x, hand.y, hand.z, neck.x, neck.y, neck.z, Config.Leash.length, false, false, 0, 0)
-            Wait(0)
+            AttachEntitiesToRope(rope, owner, animal, hand.x, hand.y, hand.z, neck.x, neck.y, neck.z, length, false, false, 0, 0)
+            Wait(50)
         end
     end)
 
