@@ -1,7 +1,6 @@
 Config = {}
 
 Config.Debug = false
-Config.MenuKey = 'F6'
 Config.AttackKey = 'G'
 Config.MaxSpawnedPets = 1
 Config.Menu = {
@@ -61,25 +60,8 @@ Config.Target = {
     useOxTarget = true,
 }
 
-Config.Shop = {
-    enabled = true,
-    useCustomUI = true,
-    name = 'Companion Emporium',
-    ped = `s_m_m_linecook`,
-    scenario = 'WORLD_HUMAN_CLIPBOARD',
-    coords = vec4(563.18, 2752.93, 42.88, 187.0),
-    currency = {
-        type = 'ox_inventory',
-        item = 'money',
-    },
-    blip = {
-        enabled = true,
-        sprite = 273,
-        color = 5,
-        scale = 0.85,
-        label = 'Companion Emporium',
-    },
-}
+-- Companions are donator / admin-given items only. There is no in-city store.
+-- Players open the kennel with /petmenu. Admins grant animals with /givepet.
 
 Config.K9 = {
     attackPlayers = true,
@@ -880,32 +862,6 @@ Config.SupplyItems = {
     leash = 'pet_leash',
     revive = 'pet_revive',
 }
-
-Config.ShopItems = {}
-
-local function pushShopItem(name, price)
-    Config.ShopItems[#Config.ShopItems + 1] = { name = name, price = price }
-end
-
-local orderedAnimals = {}
-for name, animal in pairs(Config.Animals) do
-    orderedAnimals[#orderedAnimals + 1] = { name = name, animal = animal }
-end
-table.sort(orderedAnimals, function(a, b)
-    if a.animal.category == b.animal.category then
-        return a.animal.price < b.animal.price
-    end
-    return a.animal.category < b.animal.category
-end)
-for i = 1, #orderedAnimals do
-    pushShopItem(orderedAnimals[i].name, orderedAnimals[i].animal.price)
-end
-
-local supplyOrder = { 'pet_food', 'pet_water', 'pet_collar', 'pet_leash', 'pet_revive' }
-for i = 1, #supplyOrder do
-    local name = supplyOrder[i]
-    pushShopItem(name, Config.Supplies[name].price)
-end
 
 Config.Anims = {
     petOwner = { dict = 'creatures@rottweiler@tricks@', clip = 'petting_franklin', duration = 3500 },

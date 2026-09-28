@@ -2,6 +2,13 @@ local Spawned = {}
 local Cooldown = {}
 local LastHealthWrite = {}
 local PendingToggle = {}
+local SupplyLookup = {
+    [Config.SupplyItems.food] = 'food',
+    [Config.SupplyItems.water] = 'water',
+    [Config.SupplyItems.collar] = 'collar',
+    [Config.SupplyItems.leash] = 'leash',
+    [Config.SupplyItems.revive] = 'revive',
+}
 
 math.randomseed(os.time())
 
@@ -98,16 +105,6 @@ local function addBond(meta, amount)
     end
 end
 
-local function supplies(src)
-    return {
-        food = countItem(src, Config.SupplyItems.food),
-        water = countItem(src, Config.SupplyItems.water),
-        collar = countItem(src, Config.SupplyItems.collar),
-        leash = countItem(src, Config.SupplyItems.leash),
-        revive = countItem(src, Config.SupplyItems.revive),
-    }
-end
-
 local function serialize(src, item, meta)
     local animal = Config.Animals[item.name] or {}
     local spawned = Spawned[src]
@@ -140,18 +137,25 @@ local function serialize(src, item, meta)
     }
 end
 
-local function listPets(src)
+local function scanInventory(src)
     local pets = {}
-    for slot, item in pairs(getItems(src)) do
-        if item and IsPetItem(item.name) then
-            local meta = ensureMeta(src, slot, item)
-            pets[#pets + 1] = serialize(src, item, meta)
+    local bag = { food = 0, water = 0, collar = 0, leash = 0, revive = 0 }
+    local items = getItems(src)
+    for slot, item in pairs(items) do
+        if item then
+            local supplyKey = SupplyLookup[item.name]
+            if supplyKey then
+                bag[supplyKey] = bag[supplyKey] + (item.count or 1)
+            elseif IsPetItem(item.name) then
+                local meta = ensureMeta(src, slot, item)
+                pets[#pets + 1] = serialize(src, item, meta)
+            end
         end
     end
     table.sort(pets, function(a, b)
         return a.name:lower() < b.name:lower()
     end)
-    return pets
+    return pets, bag
 end
 
 local function refresh(src, petId)
@@ -549,7 +553,7 @@ local function runAction(src, payload)
 end
 
 lib.callback.register('djfivem-pets:getMenuData', function(source, petId)
-    local pets = listPets(source)
+    local pets, bag = scanInventory(source)
     local selected = petId
     if not selected or not petId then
         if Spawned[source] then
@@ -561,7 +565,7 @@ lib.callback.register('djfivem-pets:getMenuData', function(source, petId)
     return {
         pets = pets,
         selected = selected,
-        supplies = supplies(source),
+        supplies = bag,
         spawnedPetId = Spawned[source] and Spawned[source].petId or nil,
         walking = Spawned[source] and Spawned[source].walking or false,
     }
@@ -706,65 +710,41 @@ local function registerHooks()
     end)
 end
 
-local function takeShopMoney(src, amount)
-    local currency = Config.Shop.currency or {}
-    if currency.type ~= 'ox_inventory' then
-        return false
-    end
-    local item = currency.item or 'money'
-    if countItem(src, item) < amount then
-        return false
-    end
-    return exports.ox_inventory:RemoveItem(src, item, amount) and true or false
-end
-
-lib.callback.register('djfivem-pets:getCatalog', function()
-    return GetCatalog()
-end)
-
-lib.callback.register('djfivem-pets:buyItem', function(source, itemName)
-    if not Config.Shop.enabled then
-        return { ok = false, message = locale('shop_failed') }
-    end
-    local price = GetItemPrice(itemName)
-    if not price then
-        return { ok = false, message = locale('shop_unknown') }
-    end
-    if IsK9Animal(Config.Animals[itemName]) and not IsK9Authorized(source) then
-        return { ok = false, message = locale('k9_job_required') }
-    end
-    if not takeShopMoney(source, price) then
-        return { ok = false, message = locale('shop_need_money', price) }
-    end
-
-    local metadata = IsPetItem(itemName) and DefaultPetMetadata(itemName) or nil
-    if exports.ox_inventory:AddItem(source, itemName, 1, metadata) then
-        local label = (Config.Animals[itemName] and Config.Animals[itemName].label)
-            or (Config.Supplies[itemName] and Config.Supplies[itemName].label)
-            or itemName
-        return { ok = true, message = locale('shop_bought', label, price) }
-    end
-
-    local currency = Config.Shop.currency or {}
-    if currency.type == 'ox_inventory' then
-        exports.ox_inventory:AddItem(source, currency.item or 'money', price)
-    end
-    return { ok = false, message = locale('shop_failed') }
-end)
-
 CreateThread(function()
-    if Config.Shop.enabled then
-        exports.ox_inventory:RegisterShop('djfivem_petstore', {
-            name = Config.Shop.name,
-            inventory = Config.ShopItems,
-        })
-    end
     registerHooks()
 end)
 
 CreateThread(function()
+    local tick = math.max(10, Config.Needs.walkTick) * 1000
     while true do
-        Wait(math.max(10, Config.Needs.walkTick) * 1000)
+        Wait(tick)
+        for src, spawned in pairs(Spawned) do
+            if spawned.walking then
+                local slot, item, meta = findPetById(src, spawned.petId)
+                if not slot then
+                    spawned.walking = false
+                    TriggerClientEvent('djfivem-pets:client:stopWalk', src)
+                elseif countItem(src, Config.SupplyItems.leash) < 1 then
+                    spawned.walking = false
+                    TriggerClientEvent('djfivem-pets:client:stopWalk', src)
+                    notify(src, 'error', 'need_leash')
+                elseif not meta.dead then
+                    meta.happiness = Clamp(meta.happiness + Config.Needs.walkHappinessPerTick, 0, 100)
+                    meta.hunger = Clamp(meta.hunger - Config.Needs.walkHungerCost, 0, 100)
+                    meta.thirst = Clamp(meta.thirst - Config.Needs.walkThirstCost, 0, 100)
+                    addBond(meta, Config.Needs.bondWalk)
+                    saveMeta(src, slot, meta)
+                    refresh(src, meta.petId)
+                end
+            end
+        end
+    end
+end)
+
+CreateThread(function()
+    local tick = math.max(15, Config.Decay.interval) * 1000
+    while true do
+        Wait(tick)
         for _, id in ipairs(GetPlayers()) do
             local src = tonumber(id)
             if src then
@@ -775,19 +755,6 @@ CreateThread(function()
                             local changed
                             meta, changed = ApplyDecayToMetadata(meta)
                             local spawned = Spawned[src]
-                            if spawned and spawned.petId == meta.petId and spawned.walking and not meta.dead then
-                                if countItem(src, Config.SupplyItems.leash) < 1 then
-                                    spawned.walking = false
-                                    TriggerClientEvent('djfivem-pets:client:stopWalk', src)
-                                    notify(src, 'error', 'need_leash')
-                                else
-                                    meta.happiness = Clamp(meta.happiness + Config.Needs.walkHappinessPerTick, 0, 100)
-                                    meta.hunger = Clamp(meta.hunger - Config.Needs.walkHungerCost, 0, 100)
-                                    meta.thirst = Clamp(meta.thirst - Config.Needs.walkThirstCost, 0, 100)
-                                    addBond(meta, Config.Needs.bondWalk)
-                                    changed = true
-                                end
-                            end
                             if meta.dead and spawned and spawned.petId == meta.petId then
                                 killPet(src, slot, item, meta, 'needs')
                             elseif changed then
