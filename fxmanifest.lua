@@ -4,8 +4,8 @@ lua54 'yes'
 
 name 'djfivem-pets'
 author 'DieselJones21'
-description 'Donator companion system with 41 animals, K9 commands, needs, and a polished kennel HUD'
-version '2.2.0'
+description 'City of Dreams donator companion kennel with 41 animals, K9 commands, and needs'
+version '2.3.0'
 
 ox_lib 'locale'
 

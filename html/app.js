@@ -330,10 +330,10 @@ function renderKennel() {
     $('chips').innerHTML = segs.join('');
 
     const stats = [
-        ['Health', pet.health, '#f6f3f0'],
-        ['Hunger', pet.hunger, '#e11d2e'],
-        ['Thirst', pet.thirst, '#f97316'],
-        ['Mood', pet.happiness, '#fb923c'],
+        ['Health', pet.health, '#f4f0f8'],
+        ['Hunger', pet.hunger, '#ff3cac'],
+        ['Thirst', pet.thirst, '#22e3f0'],
+        ['Mood', pet.happiness, '#c084fc'],
     ];
     $('stats').innerHTML = stats.map(([label, value, tone]) => {
         const n = Math.round(value);
