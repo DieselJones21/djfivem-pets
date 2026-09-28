@@ -14,7 +14,7 @@ There is **no in-city pet store**. Companions and supplies are donator / admin-g
 - **Walks require a collar on the pet and a leash in your inventory**
 - Guard animals can attack a targeted ped (K9 units can take down players by default)
 - Pets get hungry and thirsty, can **die**, and need a **revive kit**
-- Black kennel HUD with a red–orange gradient, opened with **`/petmenu`** (top-right, no fullscreen overlay)
+- Black **City of Dreams** kennel HUD (logo + magenta / cyan / purple accents), opened with **`/petmenu`** (top-right, no fullscreen overlay)
 - OneSync networked peds so other players can see your animal
 
 ## Roster
